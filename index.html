@@ -147,21 +147,45 @@
             </div>
         </div>
 
-        <div class="max-w-md mx-auto text-center border-t border-slate-700 pt-8 dark:border-t-4 dark:outline-blue-500">
-            <h3 class="font-bold mb-4">¡Tus propuestas prevalecen ante todo!</h3>
-            <form id="formulario-tareas" class="flex flex-col gap-3">
-                <textarea id="input-tarea" placeholder="Me gustaría..." class="w-full p-3 border border-gray-300 dark:border-slate-700 rounded-lg text-white dark:bg-slate-800 outline-none transition-all duration-300 focus:border-acento focus:ring-2 focus:ring-orange-200 resize-y min-h-[80px]"></textarea>
-                <button type="submit" class="bg-acento w-full text-white border-none py-3 px-6 rounded-lg font-bold uppercase tracking-widest cursor-pointer transition-all duration-300 shadow-sm hover:bg-orange-600 hover:shadow-md focus:ring-4 focus:ring-orange-300 outline-none">
-                    Añadir
-                </button>
-            </form>
-            <div class="mt-4">
-                <input type="text" id="input-busqueda" placeholder="Buscar propuesta..." class="w-full p-3 border border-gray-300 dark:border-slate-700 rounded-lg text-white dark:bg-slate-800 outline-none transition-all duration-300 focus:border-acento focus:ring-2 focus:ring-orange-200">
+        <div class="max-w-4xl mx-auto border-t border-slate-700 pt-8 dark:border-t-4 dark:outline-blue-500">
+            <div class="flex flex-col md:flex-row gap-8 items-start">
+
+                <div class="flex-1 w-full text-center md:text-left">
+                    <h3 class="font-bold mb-4 text-xl">¡Tus propuestas prevalecen ante todo!</h3>
+                    <form id="formulario-tareas" class="flex flex-col gap-3">
+                        <textarea id="input-tarea" placeholder="Me gustaría..." class="w-full p-3 border border-gray-300 dark:border-slate-700 rounded-lg text-white dark:bg-slate-800 outline-none transition-all duration-300 focus:border-acento focus:ring-2 focus:ring-orange-200 resize-y min-h-[80px]"></textarea>
+                        <button type="submit" class="bg-acento w-full text-white border-none py-3 px-6 rounded-lg font-bold uppercase tracking-widest cursor-pointer transition-all duration-300 shadow-sm hover:bg-orange-600 hover:shadow-md focus:ring-4 focus:ring-orange-300 outline-none">
+                            Añadir
+                        </button>
+                    </form>
+                    <div class="mt-4">
+                        <input type="text" id="input-busqueda" placeholder="Buscar propuesta..." class="w-full p-3 border border-gray-300 dark:border-slate-700 rounded-lg text-white dark:bg-slate-800 outline-none transition-all duration-300 focus:border-acento focus:ring-2 focus:ring-orange-200">
+                    </div>
+                    <div class="lista-propuestas mt-4 text-left"></div>
+                </div>
+            
+                <aside class="w-full md:w-72 bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 md:sticky md:top-28 transition-colors duration-300">
+                    <h3 class="font-bold text-lg text-primario dark:text-orange-300 mb-4 border-b border-gray-100 dark:border-slate-700 pb-2">Resumen</h3>
+                    <div class="flex flex-col gap-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 dark:text-gray-400 font-medium">Total:</span>
+                            <span id="stat-total" class="font-bold text-xl text-gray-800 dark:text-white">0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 dark:text-gray-400 font-medium">Completadas:</span>
+                            <span id="stat-completadas" class="font-bold text-xl text-green-600 dark:text-green-400">0</span>
+                        </div>
+                        <div class="flex justify-between items-center border-t border-gray-100 dark:border-slate-700 pt-3 mt-1">
+                            <span class="text-gray-600 dark:text-gray-400 font-medium">Pendientes:</span>
+                            <span id="stat-pendientes" class="font-bold text-xl text-acento">0</span>
+                        </div>
+                    </div>
+                </aside>
+            
             </div>
-            <div class="lista-propuestas mt-4"></div>
         </div>
     </footer>
-
     <script src="app.js"></script>
 </body>
+
 </html>
