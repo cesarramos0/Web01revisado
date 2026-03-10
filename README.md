@@ -11,7 +11,6 @@
 * **📋 Gestión de Propuestas (CRUD):** Los usuarios pueden añadir, visualizar y eliminar propuestas de mejora.
 * **🔍 Buscador en Tiempo Real:** Filtro inteligente de propuestas mediante expresiones regulares para una búsqueda exacta.
 * **📱 Diseño Totalmente Responsivo:** Optimizado para móviles, tablets y escritorio utilizando **Tailwind CSS 4.0**.
-* **🏗️ Seguimiento de Fabricación:** Visualización del estado actual de producción de las primeras unidades.
 * **💾 Persistencia de Datos:** Todas las propuestas se guardan en el navegador para que no se pierdan al recargar.
 
 ---
