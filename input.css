@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-primario: #2c3e50;
+  --color-acento: #e67e22;
+  --color-fondo: #f4f7f6;
+  --color-texto: #333333;
+
+  --font-principal: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-titulos: 'Georgia', serif;
+}
+
+@layer base {
+
+  html {
+    font-family: var(--font-principal);
+  }
+}

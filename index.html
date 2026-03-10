@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./dist/output.css">
+    <title>Ikeadocs</title>
+</head>
+<body class="bg-fondo text-texto font-principal leading-relaxed transition-colors duration-300 dark:bg-slate-900 dark:text-gray-200">
+    
+    <button id="btn-oscuro" class="fixed bottom-6 right-6 z-50 p-4 bg-acento text-white rounded-full shadow-lg hover:scale-110 hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 outline-none transition-all duration-300 cursor-pointer">
+        🌙
+    </button>
+
+    <header class="bg-primario dark:bg-slate-950 text-white px-5 sm:px-10 w-full h-auto sm:h-20 py-4 sm:py-0 fixed top-0 left-0 z-40 flex flex-col sm:flex-row justify-between items-center shadow-md transition-colors duration-300">
+        <h1 class="text-2xl font-titulos font-bold tracking-wide">Ikeadocs</h1>
+        <nav class="mt-3 sm:mt-0 sm:pr-10">
+            <ul class="flex gap-5 list-none">
+                <li><a href="#" class="text-white no-underline border-b-2 border-transparent pb-1 transition-all duration-300 hover:border-acento hover:text-acento focus:text-acento outline-none">Inicio</a></li>
+                <li><a href="#contacto" class="text-white no-underline border-b-2 border-transparent pb-1 transition-all duration-300 hover:border-acento hover:text-acento focus:text-acento outline-none">Contacto</a></li>
+                <li><a href="#seguimiento" class="text-white no-underline border-b-2 border-transparent pb-1 transition-all duration-300 hover:border-acento hover:text-acento focus:text-acento outline-none">Seguimiento</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="flex flex-col lg:flex-row gap-12 max-w-6xl mx-auto mt-32 px-5 lg:px-10 items-start">
+        <div class="flex-3 w-full">
+            <section class="mb-10">
+                <h2 class="mt-8 mb-4 text-primario dark:text-orange-400 font-titulos text-2xl font-bold">Lanzamiento de la nueva MKT23</h2>
+                <p class="text-pretty mb-4">
+                    Hoy se lanzó la nueva <strong>MKT23</strong>, la primera mesa inteligente que redefine el confort en el espacio de trabajo. Gracias a su sistema de <strong>elevación motorizada ultrasilenciosa</strong>, permite alternar entre trabajar sentado o de pie con un solo toque. Pero su verdadera innovación es su superficie con <strong>tecnología térmica integrada</strong>, capaz de mantener un calor suave y constante para que tus manos y brazos estén siempre a la temperatura ideal, eliminando el frío del invierno mientras trabajas.
+                </p>
+                <img src="img01.png" alt="Mesa inteligente MKT23" class="w-full max-w-3xl h-auto my-4 mx-auto rounded-lg shadow-lg block">
+            </section>
+
+            <section class="mb-10">
+                <h2 class="mt-8 mb-4 text-primario dark:text-orange-400 font-titulos text-2xl font-bold">Montaje en tiempo récord: Diversión nivel Lego</h2>
+                <p class="text-pretty mb-4">
+                    Olvídate de las cajas con cientos de tornillos sobrantes y manuales imposibles. La <strong>MKT23</strong> ha sido diseñada bajo un concepto modular de <strong>encaje intuitivo</strong>, permitiéndote ensamblar toda la estructura en menos de 10 minutos. Cada pieza encaja con un "clic" satisfactorio, utilizando un sistema de pernos preinstalados que funcionan igual que tus bloques de construcción favoritos. Es tan sencillo que el manual ni siquiera tiene palabras; solo necesitas tus manos para dar vida a tu nuevo espacio de trabajo.
+                </p>
+            </section>
+
+            <section class="mb-10">
+                <h2 id="seguimiento" class="mt-8 mb-4 text-primario dark:text-orange-400 font-titulos text-2xl font-bold">Seguimiento de fabricación de las 10 primeras MKT23</h2>
+                <div class="flex flex-col gap-3">
+                    <div class="bg-white dark:bg-slate-800 rounded-lg p-4 flex justify-between items-center shadow-sm hover:shadow-md transition-shadow">
+                        <span class="font-medium text-gray-800 dark:text-gray-200 flex-1">Corte de madera Nogal</span>
+                        <span class="hidden sm:block text-gray-500 dark:text-gray-400 text-sm flex-1 text-center">Arizona Workshop</span>
+                        <span class="bg-acento text-white px-3 py-1 rounded-full font-bold text-xs">Completado</span>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-lg p-4 flex justify-between items-center shadow-sm hover:shadow-md transition-shadow">
+                        <span class="font-medium text-gray-800 dark:text-gray-200 flex-1">Instalación térmica</span>
+                        <span class="hidden sm:block text-gray-500 dark:text-gray-400 text-sm flex-1 text-center">Electrónica</span>
+                        <span class="bg-yellow-500 text-white px-3 py-1 rounded-full font-bold text-xs">En proceso</span>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-lg p-4 flex justify-between items-center shadow-sm hover:shadow-md transition-shadow">
+                        <span class="font-medium text-gray-800 dark:text-gray-200 flex-1">Control de calidad</span>
+                        <span class="hidden sm:block text-gray-500 dark:text-gray-400 text-sm flex-1 text-center">Logística</span>
+                        <span class="bg-gray-400 text-white px-3 py-1 rounded-full font-bold text-xs">Pendiente</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-10">
+                <h2 class="mt-8 mb-4 text-primario dark:text-orange-400 font-titulos text-2xl font-bold">Lo que dicen nuestros "testers"</h2>
+                
+                <article class="border-l-4 border-acento p-5 bg-orange-50 dark:bg-slate-800 dark:border-orange-500 mb-5 rounded-r-lg shadow-sm">
+                    <h3 class="font-bold text-lg mb-2 dark:text-white">"Adiós al frío en las manos"</h3>
+                    <p class="mb-2">Llevo una semana con la <strong>MKT23</strong> y el sistema calefactable es un cambio de vida. Trabajo en un estudio muy frío y tener la superficie a 25°C mientras escribo es una maravilla. El montaje fue tal cual prometen: <strong>como un set de construcción para adultos</strong>.</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400"><em>— Javier G., Desarrollador de Software</em></p>
+                </article>
+
+                <article class="border-l-4 border-acento p-5 bg-orange-50 dark:bg-slate-800 dark:border-orange-500 mb-5 rounded-r-lg shadow-sm">
+                    <h3 class="font-bold text-lg mb-2 dark:text-white">"Silenciosa y robusta"</h3>
+                    <p class="mb-2">Me preocupaba que el motor para subir y bajar hiciera ruido, pero es casi imperceptible. La estructura encaja a la perfección, sin holguras. ¡Montarla fue más rápido que hacer un café!</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400"><em>— Lucía M., Diseñadora UX</em></p>
+                </article>
+
+                <article class="border-l-4 border-acento p-5 bg-orange-50 dark:bg-slate-800 dark:border-orange-500 mb-5 rounded-r-lg shadow-sm">
+                    <h3 class="font-bold text-lg mb-2 dark:text-white">"Experiencia 10/10"</h3>
+                    <p class="mb-2">Increíble que no necesité ni un destornillador. Es la primera vez que no me sobran piezas al armar un mueble. La función de altura me ayuda a mantenerme activo durante las reuniones largas.</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400"><em>— Carlos T., Streamer</em></p>
+                </article>
+            </section>
+        </div>
+
+        <aside class="flex-1 w-full lg:min-w-[300px] lg:max-w-[350px] bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm lg:sticky top-28 transition-all duration-300 cursor-pointer hover:bg-orange-50 dark:hover:bg-slate-700 hover:shadow-md border border-transparent dark:border-slate-700">
+            <div class="flex items-start justify-between mb-4">
+                <h3 class="font-bold text-lg text-primario dark:text-orange-300 pr-2">Sobre la originalidad de los materiales</h3>
+                <img src="autentico.png" alt="Sello-autenticidad" class="w-10">
+            </div>
+            <p class="text-sm mb-4 text-gray-700 dark:text-gray-300">
+                Estos materiales procedentes de Arizona son precisamente cortados y etiquetados pieza por pieza, garantizando que el veteado de la madera sea continuo en toda la superficie. No utilizamos aglomerados; cada tablero de <strong>nogal sólido</strong> es tratado con aceites naturales que reaccionan con el sistema de calefacción interna, mejorando la resistencia del material con el paso del tiempo.
+            </p>
+            <p class="text-sm text-gray-700 dark:text-gray-300">
+                Además, cada unidad incluye un <strong>certificado de origen</strong> con las coordenadas exactas del taller donde fue ensamblada, asegurando una trazabilidad total y un impacto ambiental mínimo en su proceso de fabricación.
+            </p>
+        </aside>
+    </main>
+
+    <div class="w-full mt-20 bg-white dark:bg-slate-800 rounded-lg shadow-sm py-12 transition-colors duration-300">
+        <section>
+            <h2 class="text-center text-primario dark:text-orange-400 font-titulos text-2xl font-bold mb-8">También te podría interesar</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 lg:px-10 max-w-6xl mx-auto">
+                <article class="bg-gray-50 dark:bg-slate-700 p-6 rounded-lg border border-gray-100 dark:border-slate-600 flex flex-col justify-between text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-acento dark:hover:border-acento cursor-pointer">
+                    <h3 class="font-medium text-sm lg:text-base dark:text-gray-200">Más allá de la espalda: Guía definitiva para elegir tu silla ergonómica ideal</h3>
+                    <img src="rec01.png" alt="imagen-recomendacion-01" class="w-full aspect-square object-cover rounded mt-5">
+                </article>
+                <article class="bg-gray-50 dark:bg-slate-700 p-6 rounded-lg border border-gray-100 dark:border-slate-600 flex flex-col justify-between text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-acento dark:hover:border-acento cursor-pointer">
+                    <h3 class="font-medium text-sm lg:text-base dark:text-gray-200">La ciencia del bienestar: Cómo crear un ambiente que potencie tu enfoque y reduzca el estrés</h3>
+                    <img src="rec02.png" alt="imagen-recomendacion-02" class="w-full aspect-square object-cover rounded mt-5">
+                </article>
+                <article class="bg-gray-50 dark:bg-slate-700 p-6 rounded-lg border border-gray-100 dark:border-slate-600 flex flex-col justify-between text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-acento dark:hover:border-acento cursor-pointer">
+                    <h3 class="font-medium text-sm lg:text-base dark:text-gray-200">Higiene postural 2.0: 5 ajustes sencillos en tu escritorio para evitar dolores crónicos</h3>
+                    <img src="rec03.png" alt="imagen-recomendacion-03" class="w-full aspect-square object-cover rounded mt-5">
+                </article>
+                <article class="bg-gray-50 dark:bg-slate-700 p-6 rounded-lg border border-gray-100 dark:border-slate-600 flex flex-col justify-between text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-acento dark:hover:border-acento cursor-pointer">
+                    <h3 class="font-medium text-sm lg:text-base dark:text-gray-200">Escritorios "Cero Distracciones": El arte de organizar un espacio de trabajo minimalista</h3>
+                    <img src="rec04.png" alt="imagen-recomendacion-04" class="w-full aspect-square object-cover rounded mt-5">
+                </article>
+                <article class="bg-gray-50 dark:bg-slate-700 p-6 rounded-lg border border-gray-100 dark:border-slate-600 flex flex-col justify-between text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-acento dark:hover:border-acento cursor-pointer">
+                    <h3 class="font-medium text-sm lg:text-base dark:text-gray-200">Nogal y Calidez: Por qué los materiales naturales transforman tu productividad.</h3>
+                    <img src="rec05.png" alt="imagen-recomendacion-05" class="w-full aspect-square object-cover rounded mt-5">
+                </article>
+                <article class="bg-gray-50 dark:bg-slate-700 p-6 rounded-lg border border-gray-100 dark:border-slate-600 flex flex-col justify-between text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-acento dark:hover:border-acento cursor-pointer">
+                    <h3 class="font-medium text-sm lg:text-base dark:text-gray-200">El fin del sedentarismo: Beneficios reales de trabajar de pie y cómo empezar sin cansarte.</h3>
+                    <img src="rec06.png" alt="imagen-recomendacion-06" class="w-full aspect-square object-cover rounded mt-5">
+                </article>
+            </div>
+        </section>
+    </div>
+
+    <footer id="contacto" class="bg-primario dark:bg-slate-950 text-white py-16 px-5 lg:px-10 mt-16 transition-colors duration-300">
+        <div class="max-w-6xl mx-auto flex flex-wrap justify-between gap-8 mb-10">
+            <div>
+                <h4 class="font-bold text-xl mb-3 text-acento">Contacto</h4>
+                <p class="text-gray-300 hover:text-white transition-colors">soporte@ikeadocs.com</p>
+                <p class="text-gray-300 hover:text-white transition-colors">+34 689 937 254</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-xl mb-3 text-acento">Síguenos</h4>
+                <div class="flex gap-4">
+                    <a href="https://www.instagram.com/ikeaspain/" class="opacity-80 hover:opacity-100 hover:scale-110 transition-all"><img src="instagram.png" alt="logotipo-de-instagram" class="w-6"></a>
+                    <a href="https://www.facebook.com/pages/IKEA-Espana/244033170035" class="opacity-80 hover:opacity-100 hover:scale-110 transition-all"><img src="facebook.png" alt="facebook" class="w-6"></a>
+                    <a href="https://web.whatsapp.com/" class="opacity-80 hover:opacity-100 hover:scale-110 transition-all"><img src="whatsapp.png" alt="whastapp" class="w-6"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-md mx-auto text-center border-t border-slate-700 pt-8 dark:border-t-4 dark:outline-blue-500">
+            <h3 class="font-bold mb-4">¡Tus propuestas prevalecen ante todo!</h3>
+            <form id="formulario-tareas" class="flex flex-col gap-3">
+                <textarea id="input-tarea" placeholder="Me gustaría..." class="w-full p-3 border border-gray-300 dark:border-slate-700 rounded-lg text-white dark:bg-slate-800 outline-none transition-all duration-300 focus:border-acento focus:ring-2 focus:ring-orange-200 resize-y min-h-[80px]"></textarea>
+                <button type="submit" class="bg-acento w-full text-white border-none py-3 px-6 rounded-lg font-bold uppercase tracking-widest cursor-pointer transition-all duration-300 shadow-sm hover:bg-orange-600 hover:shadow-md focus:ring-4 focus:ring-orange-300 outline-none">
+                    Añadir
+                </button>
+            </form>
+            <div class="mt-4">
+                <input type="text" id="input-busqueda" placeholder="Buscar propuesta..." class="w-full p-3 border border-gray-300 dark:border-slate-700 rounded-lg text-white dark:bg-slate-800 outline-none transition-all duration-300 focus:border-acento focus:ring-2 focus:ring-orange-200">
+            </div>
+            <div class="lista-propuestas mt-4"></div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
