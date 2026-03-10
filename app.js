@@ -4,6 +4,8 @@ const input = document.getElementById("input-tarea");
 const contenedorLista = document.querySelector(".lista-propuestas");
 const inputBusqueda = document.getElementById("input-busqueda");
 const btnOscuro = document.getElementById('btn-oscuro');
+const botonCompletadas = document.getElementById("btn-marcar-completadas");
+const botonEliminarCompletadas = document.getElementById("btn-eliminar-completadas");
 const htmlElement = document.documentElement;
 
 // MODO OSCURO
@@ -80,6 +82,36 @@ inputBusqueda.addEventListener("input", function() {
     });
 });
 
+// MARCAR TODAS COMO COMPLETADAS
+botonCompletadas.addEventListener("click", function() {
+    const todasLasTareas = document.querySelectorAll(".lista-propuestas .tarea-item");
+    todasLasTareas.forEach(tarea => {
+        const span = tarea.querySelector("span");
+        const estaTachada = span.classList.contains("line-through");
+        if (!estaTachada){
+            span.classList.add("line-through", "text-gray-400", "dark:text-gray-500");
+            span.classList.remove("text-gray-800", "dark:text-gray-200");
+            tarea.classList.add("bg-gray-100", "dark:bg-slate-700", "opacity-60");
+            tarea.classList.remove("bg-white", "dark:bg-slate-800", "hover:border-acento", "dark:hover:border-acento");
+        }
+    });
+    guardarTareas();
+});
+
+// ELIMINAR TODAS LAS PROPUESTAS MARCADAS COMO COMPLETADAS
+botonEliminarCompletadas.addEventListener("click", function() {
+    const todasLasTareas = document.querySelectorAll(".lista-propuestas .tarea-item");
+    todasLasTareas.forEach(tarea => {
+        const span = tarea.querySelector("span");
+        const estaTachada = span.classList.contains("line-through");
+        if (estaTachada){
+            tarea.remove();
+        }
+    });
+    guardarTareas();
+});
+
+
 // FUNCIONES AUXILIARES
 
 function crearElemento(tareaObj) {
@@ -99,6 +131,9 @@ function crearElemento(tareaObj) {
     nuevaTarea.className = clasesContenedor;
 
     nuevaTarea.innerHTML = `
+        <button class="btn-editar p-2 hover:scale-110 transition-transform cursor-pointer z-10">
+            <img src="img/editar.png" alt="eliminar-propuesta" class="w-4 h-4 dark:invert">
+        </button>
         <span class="${clasesTexto}">${tareaObj.texto}</span>
         <button class="btn-borrar p-2 hover:scale-110 transition-transform cursor-pointer z-10">
             <img src="img/cerrar.png" alt="eliminar-propuesta" class="w-4 h-4 dark:invert">
@@ -137,8 +172,28 @@ function crearElemento(tareaObj) {
         guardarTareas();
     });
 
+    // EVENTO 3: Botón de editar
+    const botonEditar = nuevaTarea.querySelector(".btn-editar");
+    botonEditar.addEventListener("click", function(event) {
+        event.stopPropagation();
+
+        const span = nuevaTarea.querySelector("span");
+        const textoActual = span.textContent;
+
+        const nuevoTexto = prompt("Edita tu propuesta:", textoActual);
+
+        if (nuevoTexto !== null && nuevoTexto.trim() !== ""){
+            span.textContent = nuevoTexto.trim();
+            guardarTareas();
+
+        }
+    });
+
     contenedorLista.appendChild(nuevaTarea);
 }
+
+function eliminarCompletadas(){}
+
 
 function guardarTareas() {
     const todasTareas = [];
