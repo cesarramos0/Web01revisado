@@ -64,3 +64,19 @@ Para visualizar el proyecto localmente, sigue estos pasos:
 El sistema de búsqueda utiliza una expresión regular para asegurar que las coincidencias sean precisas palabra por palabra:
 ```javascript
 const reglaExacta = new RegExp(`\\b${filtro}\\b`, 'i');
+
+## 🧪 Pruebas de Software (Testing)
+
+Se han realizado pruebas manuales para garantizar la estabilidad y el correcto funcionamiento de la aplicación en diversos escenarios críticos:
+
+| Caso de Prueba | Acción Realizada | Resultado Esperado | Estado |
+| :--- | :--- | :--- | :---: |
+| **Lista Vacía** | Carga inicial de la aplicación sin datos previos. | La interfaz se muestra limpia y los contadores de estadísticas marcan 0. | ✅ |
+| **Validación de Texto** | Intentar añadir una tarea sin escribir contenido. | El sistema bloquea la creación (mediante `trim()`) evitando tareas vacías. | ✅ |
+| **Desbordamiento (Overflow)** | Añadir una tarea con una palabra de más de 200 caracteres. | El diseño se mantiene intacto gracias a `break-all` y `min-w-0`. | ✅ |
+| **Gestión de Estados** | Marcar y desmarcar múltiples tareas como completadas. | El estilo visual cambia (tachado/opacidad) y las estadísticas se actualizan. | ✅ |
+| **Persistencia** | Recargar la página (`F5`) tras modificar la lista. | Los datos se recuperan correctamente desde `localStorage`. | ✅ |
+| **Limpieza Masiva** | Eliminar todas las tareas completadas mediante el botón global. | Solo se eliminan las tareas marcadas, recalculando el total. | ✅ |
+
+### Resultados Finales
+Tras las pruebas, se confirma que la gestión de memoria en el navegador es eficiente y el diseño es totalmente responsivo, adaptándose a contenidos inusuales sin romper la arquitectura visual.

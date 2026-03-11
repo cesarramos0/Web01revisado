@@ -6,6 +6,9 @@ const inputBusqueda = document.getElementById("input-busqueda");
 const btnOscuro = document.getElementById('btn-oscuro');
 const botonCompletadas = document.getElementById("btn-marcar-completadas");
 const botonEliminarCompletadas = document.getElementById("btn-eliminar-completadas");
+const filtroTotal = document.getElementById("btn-filtro-total");
+const filtroCompletadas = document.getElementById("btn-filtro-completadas");
+const filtroPendientes = document.getElementById("btn-filtro-pendientes");
 const htmlElement = document.documentElement;
 
 // MODO OSCURO
@@ -111,14 +114,16 @@ botonEliminarCompletadas.addEventListener("click", function() {
     guardarTareas();
 });
 
+filtroCompletadas.addEventListener("click", () => filtrarTareas("completadas"));
+filtroPendientes.addEventListener("click", () => filtrarTareas("pendientes"));
+filtroTotal.addEventListener("click", () => filtrarTareas("todas"));
 
 // FUNCIONES AUXILIARES
-
 function crearElemento(tareaObj) {
     const nuevaTarea = document.createElement("div");
     
     let clasesContenedor = "tarea-item flex justify-between items-center p-4 mb-3 rounded-lg shadow-sm w-full transition-all duration-300 cursor-pointer border border-transparent ";
-    let clasesTexto = "flex-1 pr-4 break-words transition-all duration-300 ";
+    let clasesTexto = "flex-1 min-w-0 pr-4 break-all transition-all duration-300 ";
 
     if (tareaObj.completada) {
         clasesContenedor += "bg-gray-100 dark:bg-slate-700 opacity-60";
@@ -192,9 +197,28 @@ function crearElemento(tareaObj) {
     contenedorLista.appendChild(nuevaTarea);
 }
 
-function eliminarCompletadas(){}
+// ENCARGADO DE FILTRAR POR TIPO: TOTAL, COMPLETADAS Y PENDIENTES
+function filtrarTareas(tipoFiltro) {
+    const todasLasTareas = document.querySelectorAll(".lista-propuestas .tarea-item");
+    
+    todasLasTareas.forEach(tarea => {
+        const span = tarea.querySelector("span");
+        const estaTachada = span.classList.contains("line-through");
+        
+        // Evaluamos qué filtro nos han pedido
+        if (tipoFiltro === "completadas") {
+            tarea.style.display = estaTachada ? "flex" : "none";
+        } 
+        else if (tipoFiltro === "pendientes") {
+            tarea.style.display = !estaTachada ? "flex" : "none";
+        } 
+        else if (tipoFiltro === "todas") {
+            tarea.style.display = "flex";
+        }
+    });
+}
 
-
+// ENCARGADO DE GUARDAR LOCALMENTE LOS DATOS
 function guardarTareas() {
     const todasTareas = [];
     const elementosTarea = document.querySelectorAll(".lista-propuestas .tarea-item");
@@ -215,6 +239,7 @@ function guardarTareas() {
     actualizarEstadisticas(todasTareas.length, completadas);
 }
 
+// ENCARGADO DE QUE SE MUESTREN LOS DATOS EN TIEMPO REAL
 function actualizarEstadisticas(total, completadas) {
     const statTotal = document.getElementById("stat-total");
     const statCompletadas = document.getElementById("stat-completadas");
