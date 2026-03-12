@@ -8,7 +8,7 @@
 </head>
 <body class="bg-fondo text-texto font-principal leading-relaxed transition-colors duration-300 dark:bg-slate-900 dark:text-gray-200">
     
-    <button id="btn-oscuro" class="fixed bottom-6 right-6 z-50 p-4 bg-acento text-white rounded-full shadow-lg hover:scale-110 hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 outline-none transition-all duration-300 cursor-pointer">
+    <button id="btn-oscuro" class="fixed bottom-6 right-6 z-50 p-4 bg-acento text-white rounded-full shadow-lg hover:scale-110 hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 outline-none transition-all duration-300 cursor-pointer backdrop-blur-sm border border-white/20 text-xl">
         🌙
     </button>
 
@@ -180,24 +180,32 @@
                     <h3 class="font-bold text-lg text-primario dark:text-white mb-4 border-b border-gray-100 dark:border-slate-700 pb-2">Resumen</h3>
                     <div class="flex flex-col gap-3">
                         <div class="flex justify-between items-center">
-                            <button id="btn-filtro-total" class="text-gray-600 cursor-pointer  hover:text-white dark:text-gray-400 font-medium">Total:</button>
+                            <button id="btn-filtro-total" class="text-gray-600 dark:text-gray-400 font-medium cursor-pointer transition-colors duration-200 hover:text-gray-400 dark:hover:text-white">
+                                Total:
+                            </button>
                             <span id="stat-total" class="font-bold text-xl text-gray-800 dark:text-white">0</span>
                         </div>
+                    
                         <div class="flex justify-between items-center">
-                            <button id="btn-filtro-completadas" class="text-gray-600 cursor-pointer hover:text-white dark:text-gray-400 font-medium">Completadas:</button>
+                            <button id="btn-filtro-completadas" class="text-gray-600 dark:text-gray-400 font-medium cursor-pointer transition-colors duration-200 hover:text-gray-400 dark:hover:text-white">
+                                Completadas:
+                            </button>
                             <span id="stat-completadas" class="font-bold text-xl text-green-600 dark:text-green-400">0</span>
                         </div>
+                    
                         <div class="flex justify-between items-center border-t border-gray-100 dark:border-slate-700 pt-3 mt-1">
-                            <button id="btn-filtro-pendientes" class="text-gray-600 cursor-pointer  hover:text-white dark:text-gray-400 font-medium">Pendientes:</button>
+                            <button id="btn-filtro-pendientes" class="text-gray-600 dark:text-gray-400 font-medium cursor-pointer transition-colors duration-200 hover:text-gray-400 dark:hover:text-white">
+                                Pendientes:
+                            </button>
                             <span id="stat-pendientes" class="font-bold text-xl text-acento">0</span>
                         </div>
+                    </div>
                     </div>
                 </aside>
             
             </div>
         </div>
     </footer>
-    <div class="hidden line-through text-gray-400 dark:text-gray-500 opacity-60 bg-gray-100 dark:bg-slate-700 min-w-0 break-all"></div>
     <script src="app.js"></script>
 </body>
 
