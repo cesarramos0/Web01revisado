@@ -134,57 +134,37 @@ function cargarTareasDeStorage() {
 function marcarTarea(tareaElemento, completada) {
   const span = tareaElemento.querySelector("span");
 
-  const clasesTextoCompletada = ["line-through", "text-gray-400", "dark:text-gray-500"];
-  const clasesTextoPendiente = ["text-gray-800", "dark:text-gray-200"];
-  const clasesContCompletada = ["bg-gray-100", "dark:bg-slate-700", "opacity-60"];
-  const clasesContPendiente = [
-    "bg-white",
-    "dark:bg-slate-800",
-    "hover:border-acento",
-    "dark:hover:border-acento",
-  ];
+  // Limpiamos primero cualquier estado previo
+  span.classList.remove(...CLASES_TEXTO_COMPLETADA, ...CLASES_TEXTO_PENDIENTE);
+  tareaElemento.classList.remove(...CLASES_CONTENEDOR_COMPLETADA, ...CLASES_CONTENEDOR_PENDIENTE);
 
   if (completada) {
-    span.classList.add(...clasesTextoCompletada);
-    span.classList.remove(...clasesTextoPendiente);
-    tareaElemento.classList.add(...clasesContCompletada);
-    tareaElemento.classList.remove(...clasesContPendiente);
+    span.classList.add(...CLASES_TEXTO_COMPLETADA);
+    tareaElemento.classList.add(...CLASES_CONTENEDOR_COMPLETADA);
   } else {
-    span.classList.remove(...clasesTextoCompletada);
-    span.classList.add(...clasesTextoPendiente);
-    tareaElemento.classList.remove(...clasesContCompletada);
-    tareaElemento.classList.add(...clasesContPendiente);
+    span.classList.add(...CLASES_TEXTO_PENDIENTE);
+    tareaElemento.classList.add(...CLASES_CONTENEDOR_PENDIENTE);
   }
 }
 
 function crearElemento(tareaObj) {
   const nuevaTarea = document.createElement("div");
 
-  const baseContenedor =
-    "tarea-item flex justify-between items-center p-4 mb-3 rounded-lg shadow-sm w-full transition-all duration-300 cursor-pointer border border-transparent ";
-  const baseTexto = "flex-1 min-w-0 pr-4 break-all transition-all duration-300 ";
-
   const estaCompletada = Boolean(tareaObj.completada);
-
-  const clasesContenedor = estaCompletada
-    ? baseContenedor + "bg-gray-100 dark:bg-slate-700 opacity-60"
-    : baseContenedor + "bg-white dark:bg-slate-800 hover:border-acento dark:hover:border-acento";
-
-  const clasesTexto = estaCompletada
-    ? baseTexto + "line-through text-gray-400 dark:text-gray-500"
-    : baseTexto + "text-gray-800 dark:text-gray-200";
-
-  nuevaTarea.className = clasesContenedor;
+  nuevaTarea.className = CLASES_CONTENEDOR_BASE;
 
   nuevaTarea.innerHTML = `
     <button class="btn-editar p-2 hover:scale-110 transition-transform cursor-pointer z-10">
       <img src="img/editar.png" alt="editar-propuesta" class="w-4 h-4 dark:invert">
     </button>
-    <span class="${clasesTexto}">${tareaObj.texto}</span>
+    <span class="${CLASES_TEXTO_BASE}">${tareaObj.texto}</span>
     <button class="btn-borrar p-2 hover:scale-110 transition-transform cursor-pointer z-10">
       <img src="img/cerrar.png" alt="eliminar-propuesta" class="w-4 h-4 dark:invert">
     </button>
   `;
+
+  // Aplicamos el estado visual inicial (completada/pendiente) en un solo sitio
+  marcarTarea(nuevaTarea, estaCompletada);
 
   // Marcar/Desmarcar como completada
   nuevaTarea.addEventListener("click", (event) => {
