@@ -20,8 +20,17 @@ const estadisticas = {
 
 const SELECTOR_TAREA_ITEM = ".lista-propuestas .tarea-item";
 
+/**
+ * Devuelve todos los elementos DOM de tareas actuales.
+ * @returns {HTMLElement[]} Lista de nodos de tarea.
+ */
 const obtenerTareasDom = () => Array.from(document.querySelectorAll(SELECTOR_TAREA_ITEM));
 
+/**
+ * Obtiene información estructurada de una tarea a partir de su nodo.
+ * @param {HTMLElement} tareaElemento - Contenedor de la tarea.
+ * @returns {{ span: HTMLSpanElement, texto: string, estaCompletada: boolean }}
+ */
 function obtenerEstadoDeTarea(tareaElemento) {
   const span = tareaElemento.querySelector("span");
   const texto = span.textContent;
@@ -31,7 +40,16 @@ function obtenerEstadoDeTarea(tareaElemento) {
 }
 
 // Helpers
+/**
+ * Indica si el tema actual aplicado al documento es oscuro.
+ * @returns {boolean}
+ */
 const esTemaOscuro = () => raizHTML.classList.contains("dark");
+
+/**
+ * Aplica el tema indicado al documento y lo persiste en localStorage.
+ * @param {"light" | "dark"} theme - Tema a aplicar.
+ */
 const aplicarTema = (theme) => {
   if (theme === "dark") {
     raizHTML.classList.add("dark");
@@ -120,6 +138,10 @@ botonFiltroPendientes.addEventListener("click", () => filtrarTareas("pendientes"
 botonFiltroTotal.addEventListener("click", () => filtrarTareas("todas"));
 
 // FUNCIONES AUXILIARES
+/**
+ * Lee las tareas guardadas en localStorage y las pinta en la interfaz.
+ * Normaliza tanto el formato antiguo (string) como el nuevo (objeto).
+ */
 function cargarTareasDeStorage() {
   const almacenadas = JSON.parse(localStorage.getItem("tareas-mkt23")) || [];
 
@@ -131,6 +153,11 @@ function cargarTareasDeStorage() {
   guardarTareas();
 }
 
+/**
+ * Actualiza el aspecto visual de una tarea según su estado de completada.
+ * @param {HTMLElement} tareaElemento - Contenedor DOM de la tarea.
+ * @param {boolean} completada - Si la tarea debe mostrarse como completada.
+ */
 function marcarTarea(tareaElemento, completada) {
   const span = tareaElemento.querySelector("span");
 
@@ -147,6 +174,10 @@ function marcarTarea(tareaElemento, completada) {
   }
 }
 
+/**
+ * Crea un nuevo elemento de tarea en el DOM y registra sus eventos.
+ * @param {{ texto: string, completada: boolean }} tareaObj - Datos de la tarea.
+ */
 function crearElemento(tareaObj) {
   const nuevaTarea = document.createElement("div");
 
@@ -200,10 +231,14 @@ function crearElemento(tareaObj) {
     }
   });
 
-  contenedorLista.appendChild(nuevaTarea);
+  listaPropuestas.appendChild(nuevaTarea);
 }
 
 // FILTRO: TOTAL, COMPLETADAS Y PENDIENTES
+/**
+ * Muestra/oculta tareas según el tipo de filtro indicado.
+ * @param {"completadas" | "pendientes" | "todas"} tipoFiltro - Tipo de filtro a aplicar.
+ */
 function filtrarTareas(tipoFiltro) {
   obtenerTareasDom().forEach((tarea) => {
     const { estaCompletada } = obtenerEstadoDeTarea(tarea);
@@ -219,6 +254,10 @@ function filtrarTareas(tipoFiltro) {
 }
 
 // GUARDAR LOCALMENTE
+/**
+ * Recorre las tareas actuales del DOM y las guarda en localStorage,
+ * además de recalcular y actualizar las estadísticas.
+ */
 function guardarTareas() {
   const todasTareas = [];
   let completadas = 0;
@@ -235,14 +274,20 @@ function guardarTareas() {
 }
 
 // ACTUALIZAR ESTADÍSTICAS
+/**
+ * Refleja en el panel lateral las estadísticas de tareas.
+ * Solo actualiza cuando el valor cambia para evitar repintados innecesarios.
+ * @param {number} total - Número total de tareas.
+ * @param {number} completadas - Número de tareas completadas.
+ */
 function actualizarEstadisticas(total, completadas) {
-  if (!statRefs.total || !statRefs.completadas || !statRefs.pendientes) return;
+  if (!estadisticas.total || !estadisticas.completadas || !estadisticas.pendientes) return;
 
-  if (statRefs.total.textContent !== String(total)) statRefs.total.textContent = total;
-  if (statRefs.completadas.textContent !== String(completadas))
-    statRefs.completadas.textContent = completadas;
+  if (estadisticas.total.textContent !== String(total)) estadisticas.total.textContent = total;
+  if (estadisticas.completadas.textContent !== String(completadas))
+    estadisticas.completadas.textContent = completadas;
 
   const pendientes = total - completadas;
-  if (statRefs.pendientes.textContent !== String(pendientes))
-    statRefs.pendientes.textContent = pendientes;
+  if (estadisticas.pendientes.textContent !== String(pendientes))
+    estadisticas.pendientes.textContent = pendientes;
 }
