@@ -9,6 +9,14 @@ const botonBorrarCompletadas = document.getElementById("btn-eliminar-completadas
 const botonFiltroTotal = document.getElementById("btn-filtro-total");
 const botonFiltroCompletadas = document.getElementById("btn-filtro-completadas");
 const botonFiltroPendientes = document.getElementById("btn-filtro-pendientes");
+const CLASES_CONTENEDOR_BASE = "tarea-item flex justify-between items-center p-4 mb-3 rounded-lg shadow-sm w-full transition-all duration-300 cursor-pointer border border-transparent bg-white dark:bg-slate-800 hover:border-acento dark:hover:border-acento";
+const CLASES_TEXTO_BASE = "flex-1 min-w-0 pr-4 break-all transition-all duration-300 text-gray-800 dark:text-gray-200";
+
+const CLASES_CONTENEDOR_COMPLETADA = ["bg-gray-100", "dark:bg-slate-700", "opacity-60"];
+const CLASES_CONTENEDOR_PENDIENTE = ["bg-white", "dark:bg-slate-800"];
+
+const CLASES_TEXTO_COMPLETADA = ["line-through", "text-gray-400", "dark:text-gray-500"];
+const CLASES_TEXTO_PENDIENTE = ["text-gray-800", "dark:text-gray-200"];
 const raizHTML = document.documentElement;
 
 // Referencias a estadísticas (si existen en el HTML)
