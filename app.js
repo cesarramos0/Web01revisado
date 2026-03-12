@@ -1,28 +1,28 @@
 // VARIABLES
-const formulario = document.getElementById("formulario-tareas");
-const input = document.getElementById("input-tarea");
-const contenedorLista = document.querySelector(".lista-propuestas");
-const inputBusqueda = document.getElementById("input-busqueda");
-const btnOscuro = document.getElementById("btn-oscuro");
-const botonCompletadas = document.getElementById("btn-marcar-completadas");
-const botonEliminarCompletadas = document.getElementById("btn-eliminar-completadas");
-const filtroTotal = document.getElementById("btn-filtro-total");
-const filtroCompletadas = document.getElementById("btn-filtro-completadas");
-const filtroPendientes = document.getElementById("btn-filtro-pendientes");
-const htmlElement = document.documentElement;
+const formularioTareas = document.getElementById("formulario-tareas");
+const textareaPropuesta = document.getElementById("input-tarea");
+const listaPropuestas = document.querySelector(".lista-propuestas");
+const buscadorPropuestas = document.getElementById("input-busqueda");
+const botonTema = document.getElementById("btn-oscuro");
+const botonMarcarCompletadas = document.getElementById("btn-marcar-completadas");
+const botonBorrarCompletadas = document.getElementById("btn-eliminar-completadas");
+const botonFiltroTotal = document.getElementById("btn-filtro-total");
+const botonFiltroCompletadas = document.getElementById("btn-filtro-completadas");
+const botonFiltroPendientes = document.getElementById("btn-filtro-pendientes");
+const raizHTML = document.documentElement;
 
 // Referencias a estadísticas (si existen en el HTML)
-const statRefs = {
+const estadisticas = {
   total: document.getElementById("stat-total"),
   completadas: document.getElementById("stat-completadas"),
   pendientes: document.getElementById("stat-pendientes"),
 };
 
-const SELECTOR_TAREA = ".lista-propuestas .tarea-item";
+const SELECTOR_TAREA_ITEM = ".lista-propuestas .tarea-item";
 
-const obtenerTareasDOM = () => Array.from(document.querySelectorAll(SELECTOR_TAREA));
+const obtenerTareasDom = () => Array.from(document.querySelectorAll(SELECTOR_TAREA_ITEM));
 
-function obtenerEstadoTarea(tareaElemento) {
+function obtenerEstadoDeTarea(tareaElemento) {
   const span = tareaElemento.querySelector("span");
   const texto = span.textContent;
   const estaCompletada = span.classList.contains("line-through");
@@ -31,31 +31,31 @@ function obtenerEstadoTarea(tareaElemento) {
 }
 
 // Helpers
-const isDark = () => htmlElement.classList.contains("dark");
-const setTheme = (theme) => {
+const esTemaOscuro = () => raizHTML.classList.contains("dark");
+const aplicarTema = (theme) => {
   if (theme === "dark") {
-    htmlElement.classList.add("dark");
-    btnOscuro.textContent = "☀️";
+    raizHTML.classList.add("dark");
+    botonTema.textContent = "☀️";
   } else {
-    htmlElement.classList.remove("dark");
-    btnOscuro.textContent = "🌙";
+    raizHTML.classList.remove("dark");
+    botonTema.textContent = "🌙";
   }
   localStorage.setItem("theme", theme);
 };
 
 // MODO OSCURO
 if (localStorage.getItem("theme") === "dark") {
-  setTheme("dark");
+  aplicarTema("dark");
 } else {
-  setTheme("light");
+  aplicarTema("light");
 }
 
-btnOscuro.addEventListener("click", () => {
-  setTheme(isDark() ? "light" : "dark");
+botonTema.addEventListener("click", () => {
+  aplicarTema(esTemaOscuro() ? "light" : "dark");
 });
 
 // AUTO-RESIZE TEXTAREA
-input.addEventListener("input", function () {
+textareaPropuesta.addEventListener("input", function () {
   this.style.height = "auto";
   this.style.height = `${this.scrollHeight}px`;
 });
@@ -66,23 +66,23 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ESCUCHA DE EVENTOS (Añadir tarea)
-formulario.addEventListener("submit", (event) => {
+formularioTareas.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  const texto = input.value.trim();
+  const texto = textareaPropuesta.value.trim();
   if (!texto) return;
 
   crearElemento({ texto, completada: false });
 
-  input.value = "";
-  input.style.height = "auto";
+  textareaPropuesta.value = "";
+  textareaPropuesta.style.height = "auto";
   guardarTareas();
 });
 
 // BUSQUEDA DE PROPUESTAS
-inputBusqueda.addEventListener("input", () => {
-  const filtro = inputBusqueda.value.toLowerCase().trim();
-  const propuestas = obtenerTareasDOM();
+buscadorPropuestas.addEventListener("input", () => {
+  const filtro = buscadorPropuestas.value.toLowerCase().trim();
+  const propuestas = obtenerTareasDom();
 
   if (!filtro) {
     propuestas.forEach((p) => (p.style.display = "flex"));
@@ -98,15 +98,15 @@ inputBusqueda.addEventListener("input", () => {
 });
 
 // MARCAR TODAS COMO COMPLETADAS
-botonCompletadas.addEventListener("click", () => {
-  obtenerTareasDOM().forEach((tarea) => marcarTarea(tarea, true));
+botonMarcarCompletadas.addEventListener("click", () => {
+  obtenerTareasDom().forEach((tarea) => marcarTarea(tarea, true));
   guardarTareas();
 });
 
 // ELIMINAR TODAS LAS PROPUESTAS MARCADAS COMO COMPLETADAS
-botonEliminarCompletadas.addEventListener("click", () => {
-  obtenerTareasDOM().forEach((tarea) => {
-    const { estaCompletada } = obtenerEstadoTarea(tarea);
+botonBorrarCompletadas.addEventListener("click", () => {
+  obtenerTareasDom().forEach((tarea) => {
+    const { estaCompletada } = obtenerEstadoDeTarea(tarea);
     if (estaCompletada) {
       tarea.remove();
     }
@@ -115,9 +115,9 @@ botonEliminarCompletadas.addEventListener("click", () => {
 });
 
 // Filtros
-filtroCompletadas.addEventListener("click", () => filtrarTareas("completadas"));
-filtroPendientes.addEventListener("click", () => filtrarTareas("pendientes"));
-filtroTotal.addEventListener("click", () => filtrarTareas("todas"));
+botonFiltroCompletadas.addEventListener("click", () => filtrarTareas("completadas"));
+botonFiltroPendientes.addEventListener("click", () => filtrarTareas("pendientes"));
+botonFiltroTotal.addEventListener("click", () => filtrarTareas("todas"));
 
 // FUNCIONES AUXILIARES
 function cargarTareasDeStorage() {
@@ -225,8 +225,8 @@ function crearElemento(tareaObj) {
 
 // FILTRO: TOTAL, COMPLETADAS Y PENDIENTES
 function filtrarTareas(tipoFiltro) {
-  obtenerTareasDOM().forEach((tarea) => {
-    const { estaCompletada } = obtenerEstadoTarea(tarea);
+  obtenerTareasDom().forEach((tarea) => {
+    const { estaCompletada } = obtenerEstadoDeTarea(tarea);
 
     if (tipoFiltro === "completadas") {
       tarea.style.display = estaCompletada ? "flex" : "none";
@@ -243,8 +243,8 @@ function guardarTareas() {
   const todasTareas = [];
   let completadas = 0;
 
-  obtenerTareasDOM().forEach((tarea) => {
-    const { texto, estaCompletada } = obtenerEstadoTarea(tarea);
+  obtenerTareasDom().forEach((tarea) => {
+    const { texto, estaCompletada } = obtenerEstadoDeTarea(tarea);
 
     if (estaCompletada) completadas++;
     todasTareas.push({ texto, completada: estaCompletada });
