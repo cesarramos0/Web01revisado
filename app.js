@@ -1,6 +1,8 @@
 // VARIABLES
 const formularioTareas = document.getElementById("formulario-tareas");
 const textareaPropuesta = document.getElementById("input-tarea");
+const mensajeErrorTarea = document.getElementById("input-tarea-error");
+const contadorTarea = document.getElementById("input-tarea-contador");
 const listaPropuestas = document.querySelector(".lista-propuestas");
 const buscadorPropuestas = document.getElementById("input-busqueda");
 const botonTema = document.getElementById("btn-oscuro");
@@ -15,6 +17,7 @@ const CLASES_CONTENEDOR_COMPLETADA = ["bg-gray-100", "dark:bg-slate-700", "opaci
 const CLASES_CONTENEDOR_PENDIENTE = ["bg-white", "dark:bg-slate-800"];
 const CLASES_TEXTO_COMPLETADA = ["line-through", "text-gray-400", "dark:text-gray-500"];
 const CLASES_TEXTO_PENDIENTE = ["text-gray-800", "dark:text-gray-200"];
+const MAX_CARACTERES_TAREA = 120;
 const raizHTML = document.documentElement;
 
 // Referencias a estadísticas (si existen en el HTML)
@@ -68,6 +71,61 @@ const aplicarTema = (theme) => {
 };
 
 /**
+ * Valida el texto de la tarea según longitud.
+ * @param {string} texto
+ * @param {{ max?: number }} [opciones]
+ * @returns {{ ok: boolean, error?: string, length: number, max: number }}
+ */
+function validarTextoTarea(texto, opciones = {}) {
+  const max = typeof opciones.max === "number" && opciones.max > 0 ? opciones.max : MAX_CARACTERES_TAREA;
+  const limpio = texto ?? "";
+  const length = limpio.trim().length;
+
+  if (!length) {
+    return {
+      ok: false,
+      error: "Escribe una propuesta antes de añadirla.",
+      length,
+      max,
+    };
+  }
+
+  if (length > max) {
+    return {
+      ok: false,
+      error: `Has superado el límite de ${max} caracteres (${length}).`,
+      length,
+      max,
+    };
+  }
+
+  return { ok: true, length, max };
+}
+
+/**
+ * Refleja en la interfaz el resultado de la validación del textarea.
+ * @param {{ ok: boolean, error?: string, length: number, max: number }} resultado
+ */
+function actualizarUIValidacionTarea(resultado) {
+  if (contadorTarea) {
+    contadorTarea.textContent = `${resultado.length} / ${resultado.max}`;
+    const tieneError = !resultado.ok;
+    contadorTarea.classList.toggle("text-red-600", tieneError);
+    contadorTarea.classList.toggle("dark:text-red-400", tieneError);
+  }
+
+  if (mensajeErrorTarea) {
+    if (!resultado.ok && resultado.error) {
+      mensajeErrorTarea.textContent = resultado.error;
+      mensajeErrorTarea.classList.remove("opacity-0");
+    } else {
+      mensajeErrorTarea.textContent = "";
+      mensajeErrorTarea.classList.add("opacity-0");
+    }
+  }
+}
+
+/**
  * Pide confirmación antes de eliminar tareas.
  * @param {{ modo: "una" | "completadas", textoTarea?: string, cantidad?: number }} params
  * @returns {boolean}
@@ -105,11 +163,17 @@ botonTema.addEventListener("click", () => {
   aplicarTema(esTemaOscuro() ? "light" : "dark");
 });
 
-// AUTO-RESIZE TEXTAREA
+// AUTO-RESIZE TEXTAREA + VALIDACIÓN EN TIEMPO REAL
 textareaPropuesta.addEventListener("input", function () {
   this.style.height = "auto";
   this.style.height = `${this.scrollHeight}px`;
+
+  const resultado = validarTextoTarea(this.value, { max: MAX_CARACTERES_TAREA });
+  actualizarUIValidacionTarea(resultado);
 });
+
+// Estado inicial de contador/validación
+actualizarUIValidacionTarea(validarTextoTarea(textareaPropuesta.value || "", { max: MAX_CARACTERES_TAREA }));
 
 // RECUPERACIÓN DE ELEMENTOS (Al cargar la página)
 document.addEventListener("DOMContentLoaded", () => {
@@ -120,13 +184,22 @@ document.addEventListener("DOMContentLoaded", () => {
 formularioTareas.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  const texto = textareaPropuesta.value.trim();
-  if (!texto) return;
+  const texto = textareaPropuesta.value || "";
+  const resultado = validarTextoTarea(texto, { max: MAX_CARACTERES_TAREA });
+  actualizarUIValidacionTarea(resultado);
 
-  crearElemento({ texto, completada: false });
+  if (!resultado.ok) {
+    textareaPropuesta.focus();
+    return;
+  }
+
+  const textoLimpio = texto.trim();
+  crearElemento({ texto: textoLimpio, completada: false });
 
   textareaPropuesta.value = "";
   textareaPropuesta.style.height = "auto";
+  const resultadoReset = validarTextoTarea("", { max: MAX_CARACTERES_TAREA });
+  actualizarUIValidacionTarea(resultadoReset);
   guardarTareas();
 });
 

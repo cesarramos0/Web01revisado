@@ -155,6 +155,12 @@
                     
                     <form id="formulario-tareas" class="flex flex-col gap-3">
                         <textarea id="input-tarea" placeholder="Me gustaría..." class="w-full p-3 border border-gray-300 dark:border-slate-700 rounded-lg text-white dark:bg-slate-800 outline-none transition-all duration-300 focus:border-acento focus:ring-2 focus:ring-orange-200 resize-y min-h-[80px]"></textarea>
+                        
+                        <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            <p id="input-tarea-error" class="max-w-[70%] text-red-600 dark:text-red-400 transition-opacity duration-200 opacity-0 whitespace-pre-line"></p>
+                            <span id="input-tarea-contador" class="ml-auto tabular-nums">0 / 120</span>
+                        </div>
+
                         <button type="submit" class="bg-acento w-full text-white border-none py-3 px-6 rounded-lg font-bold uppercase tracking-widest cursor-pointer transition-all duration-300 shadow-sm hover:bg-orange-600 hover:shadow-md focus:ring-4 focus:ring-orange-300 outline-none">
                             Añadir
                         </button>
