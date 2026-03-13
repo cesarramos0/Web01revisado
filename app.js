@@ -8,6 +8,10 @@ const buscadorPropuestas = document.getElementById("input-busqueda");
 const botonTema = document.getElementById("btn-oscuro");
 const botonMarcarCompletadas = document.getElementById("btn-marcar-completadas");
 const botonBorrarCompletadas = document.getElementById("btn-eliminar-completadas");
+const botonDeshacer = document.getElementById("btn-deshacer");
+const botonExportarJSON = document.getElementById("btn-exportar-json");
+const botonImportarJSON = document.getElementById("btn-importar-json");
+const inputImportarJSON = document.getElementById("input-importar-json");
 const botonFiltroTotal = document.getElementById("btn-filtro-total");
 const botonFiltroCompletadas = document.getElementById("btn-filtro-completadas");
 const botonFiltroPendientes = document.getElementById("btn-filtro-pendientes");
@@ -19,6 +23,10 @@ const CLASES_TEXTO_COMPLETADA = ["line-through", "text-gray-400", "dark:text-gra
 const CLASES_TEXTO_PENDIENTE = ["text-gray-800", "dark:text-gray-200"];
 const MAX_CARACTERES_TAREA = 120;
 const raizHTML = document.documentElement;
+
+const STORAGE_TAREAS_KEY = "tareas-mkt23";
+const STORAGE_UNDO_KEY = "tareas-mkt23-undo";
+const MAX_UNDO_ACCIONES = 20;
 
 // Referencias a estadísticas (si existen en el HTML)
 const estadisticas = {
@@ -36,16 +44,25 @@ const SELECTOR_TAREA_ITEM = ".lista-propuestas .tarea-item";
 const obtenerTareasDom = () => Array.from(document.querySelectorAll(SELECTOR_TAREA_ITEM));
 
 /**
+ * Genera un id corto para tareas.
+ * @returns {string}
+ */
+function generarIdTarea() {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+/**
  * Obtiene información estructurada de una tarea a partir de su nodo.
  * @param {HTMLElement} tareaElemento - Contenedor de la tarea.
- * @returns {{ span: HTMLSpanElement, texto: string, estaCompletada: boolean }}
+ * @returns {{ span: HTMLSpanElement, texto: string, estaCompletada: boolean, id: string }}
  */
 function obtenerEstadoDeTarea(tareaElemento) {
   const span = tareaElemento.querySelector("span");
   const texto = span.textContent;
   const estaCompletada = span.classList.contains("line-through");
+  const id = tareaElemento.dataset.id || "";
 
-  return { span, texto, estaCompletada };
+  return { span, texto, estaCompletada, id };
 }
 
 // Helpers
@@ -152,6 +169,53 @@ function confirmarEliminacion(params) {
   return window.confirm("¿Seguro que quieres eliminar?");
 }
 
+/**
+ * Carga la pila de acciones Undo desde localStorage.
+ * @returns {Array}
+ */
+function cargarUndoStack() {
+  try {
+    const raw = localStorage.getItem(STORAGE_UNDO_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Persiste la pila de acciones Undo en localStorage.
+ * @param {Array} stack
+ */
+function guardarUndoStack(stack) {
+  try {
+    localStorage.setItem(STORAGE_UNDO_KEY, JSON.stringify(stack.slice(0, MAX_UNDO_ACCIONES)));
+  } catch {
+    // noop
+  }
+}
+
+let undoStack = cargarUndoStack();
+
+function actualizarUIUndo() {
+  if (!botonDeshacer) return;
+  botonDeshacer.disabled = undoStack.length === 0;
+}
+
+function pushUndo(accion) {
+  undoStack.unshift(accion);
+  undoStack = undoStack.slice(0, MAX_UNDO_ACCIONES);
+  guardarUndoStack(undoStack);
+  actualizarUIUndo();
+}
+
+function popUndo() {
+  const accion = undoStack.shift();
+  guardarUndoStack(undoStack);
+  actualizarUIUndo();
+  return accion;
+}
+
 // MODO OSCURO
 if (localStorage.getItem("theme") === "dark") {
   aplicarTema("dark");
@@ -174,6 +238,7 @@ textareaPropuesta.addEventListener("input", function () {
 
 // Estado inicial de contador/validación
 actualizarUIValidacionTarea(validarTextoTarea(textareaPropuesta.value || "", { max: MAX_CARACTERES_TAREA }));
+actualizarUIUndo();
 
 // RECUPERACIÓN DE ELEMENTOS (Al cargar la página)
 document.addEventListener("DOMContentLoaded", () => {
@@ -194,7 +259,7 @@ formularioTareas.addEventListener("submit", (event) => {
   }
 
   const textoLimpio = texto.trim();
-  crearElemento({ texto: textoLimpio, completada: false });
+  crearElemento({ id: generarIdTarea(), texto: textoLimpio, completada: false });
 
   textareaPropuesta.value = "";
   textareaPropuesta.style.height = "auto";
@@ -223,20 +288,47 @@ buscadorPropuestas.addEventListener("input", () => {
 
 // MARCAR TODAS COMO COMPLETADAS
 botonMarcarCompletadas.addEventListener("click", () => {
-  obtenerTareasDom().forEach((tarea) => marcarTarea(tarea, true));
+  const tareas = obtenerTareasDom();
+  if (tareas.length === 0) return;
+
+  const antes = tareas.map((tarea) => {
+    const { id, estaCompletada } = obtenerEstadoDeTarea(tarea);
+    return { id, completada: estaCompletada };
+  });
+
+  // Si ya están todas completadas, no hacemos nada (ni guardamos undo)
+  const yaTodas = antes.every((t) => t.completada);
+  if (yaTodas) return;
+
+  pushUndo({ type: "mark_all_completed", before: antes, at: Date.now() });
+  tareas.forEach((tarea) => marcarTarea(tarea, true));
   guardarTareas();
 });
 
 // ELIMINAR TODAS LAS PROPUESTAS MARCADAS COMO COMPLETADAS
 botonBorrarCompletadas.addEventListener("click", () => {
   const tareas = obtenerTareasDom();
-  const completadas = tareas.filter((tarea) => obtenerEstadoDeTarea(tarea).estaCompletada);
+  const completadas = tareas
+    .map((tarea, index) => ({ tarea, index, estado: obtenerEstadoDeTarea(tarea) }))
+    .filter((x) => x.estado.estaCompletada);
   if (completadas.length === 0) return;
 
   const confirmado = confirmarEliminacion({ modo: "completadas", cantidad: completadas.length });
   if (!confirmado) return;
 
-  completadas.forEach((tarea) => tarea.remove());
+  // Guardamos undo con datos + posición original
+  pushUndo({
+    type: "delete_completed",
+    items: completadas.map((x) => ({
+      id: x.estado.id,
+      texto: x.estado.texto,
+      completada: x.estado.estaCompletada,
+      index: x.index,
+    })),
+    at: Date.now(),
+  });
+
+  completadas.forEach((x) => x.tarea.remove());
   guardarTareas();
 });
 
@@ -251,10 +343,15 @@ botonFiltroTotal.addEventListener("click", () => filtrarTareas("todas"));
  * Normaliza tanto el formato antiguo (string) como el nuevo (objeto).
  */
 function cargarTareasDeStorage() {
-  const almacenadas = JSON.parse(localStorage.getItem("tareas-mkt23")) || [];
+  const almacenadas = JSON.parse(localStorage.getItem(STORAGE_TAREAS_KEY)) || [];
 
   almacenadas.forEach((item) => {
-    const tarea = typeof item === "string" ? { texto: item, completada: false } : item;
+    const tareaBase = typeof item === "string" ? { texto: item, completada: false } : item;
+    const tarea = {
+      id: tareaBase.id || generarIdTarea(),
+      texto: tareaBase.texto,
+      completada: Boolean(tareaBase.completada),
+    };
     crearElemento(tarea);
   });
 
@@ -284,13 +381,15 @@ function marcarTarea(tareaElemento, completada) {
 
 /**
  * Crea un nuevo elemento de tarea en el DOM y registra sus eventos.
- * @param {{ texto: string, completada: boolean }} tareaObj - Datos de la tarea.
+ * @param {{ id: string, texto: string, completada: boolean }} tareaObj - Datos de la tarea.
+ * @param {{ insertIndex?: number }} [opciones]
  */
-function crearElemento(tareaObj) {
+function crearElemento(tareaObj, opciones = {}) {
   const nuevaTarea = document.createElement("div");
 
   const estaCompletada = Boolean(tareaObj.completada);
   nuevaTarea.className = CLASES_CONTENEDOR_BASE;
+  nuevaTarea.dataset.id = tareaObj.id;
 
   nuevaTarea.innerHTML = `
     <button class="btn-editar p-2 hover:scale-110 transition-transform cursor-pointer z-10">
@@ -319,9 +418,16 @@ function crearElemento(tareaObj) {
   const botonEliminar = nuevaTarea.querySelector(".btn-borrar");
   botonEliminar.addEventListener("click", (event) => {
     event.stopPropagation();
-    const { texto } = obtenerEstadoDeTarea(nuevaTarea);
+    const { texto, id, estaCompletada } = obtenerEstadoDeTarea(nuevaTarea);
     const confirmado = confirmarEliminacion({ modo: "una", textoTarea: texto });
     if (!confirmado) return;
+
+    const index = obtenerTareasDom().indexOf(nuevaTarea);
+    pushUndo({
+      type: "delete_one",
+      item: { id, texto, completada: estaCompletada, index },
+      at: Date.now(),
+    });
     nuevaTarea.remove();
     guardarTareas();
   });
@@ -342,7 +448,13 @@ function crearElemento(tareaObj) {
     }
   });
 
-  listaPropuestas.appendChild(nuevaTarea);
+  const insertIndex = Number.isFinite(opciones.insertIndex) ? opciones.insertIndex : undefined;
+  const children = Array.from(listaPropuestas.children);
+  if (insertIndex === undefined || insertIndex < 0 || insertIndex >= children.length) {
+    listaPropuestas.appendChild(nuevaTarea);
+  } else {
+    listaPropuestas.insertBefore(nuevaTarea, children[insertIndex]);
+  }
 }
 
 // FILTRO: TOTAL, COMPLETADAS Y PENDIENTES
@@ -374,14 +486,120 @@ function guardarTareas() {
   let completadas = 0;
 
   obtenerTareasDom().forEach((tarea) => {
-    const { texto, estaCompletada } = obtenerEstadoDeTarea(tarea);
+    const { texto, estaCompletada, id } = obtenerEstadoDeTarea(tarea);
 
     if (estaCompletada) completadas++;
-    todasTareas.push({ texto, completada: estaCompletada });
+    todasTareas.push({ id, texto, completada: estaCompletada });
   });
 
-  localStorage.setItem("tareas-mkt23", JSON.stringify(todasTareas));
+  localStorage.setItem(STORAGE_TAREAS_KEY, JSON.stringify(todasTareas));
   actualizarEstadisticas(todasTareas.length, completadas);
+}
+
+/**
+ * Devuelve tareas normalizadas a partir de un array cualquiera.
+ * Acepta formato antiguo (string) y nuevo (objeto).
+ * @param {any[]} array
+ * @returns {{ id: string, texto: string, completada: boolean }[]}
+ */
+function normalizarTareas(array) {
+  if (!Array.isArray(array)) return [];
+
+  const normalizadas = [];
+  array.forEach((item) => {
+    if (typeof item === "string") {
+      const texto = item.trim();
+      if (!texto) return;
+      normalizadas.push({ id: generarIdTarea(), texto, completada: false });
+      return;
+    }
+
+    if (item && typeof item === "object") {
+      const texto = String(item.texto ?? "").trim();
+      if (!texto) return;
+      normalizadas.push({
+        id: String(item.id || generarIdTarea()),
+        texto,
+        completada: Boolean(item.completada),
+      });
+    }
+  });
+
+  return normalizadas;
+}
+
+/**
+ * Exporta las tareas actuales como JSON (string) y dispara descarga.
+ * @returns {string}
+ */
+function exportarTareasComoJSON() {
+  let tareas = [];
+  try {
+    tareas = JSON.parse(localStorage.getItem(STORAGE_TAREAS_KEY) || "[]");
+  } catch {
+    tareas = [];
+  }
+  const normalizadas = normalizarTareas(tareas);
+
+  const payload = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    app: "Ikeadocs",
+    tareas: normalizadas,
+  };
+
+  const jsonString = JSON.stringify(payload, null, 2);
+
+  const blob = new Blob([jsonString], { type: "application/json;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `tareas-mkt23-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+
+  return jsonString;
+}
+
+/**
+ * Importa tareas desde un string JSON.
+ * Reemplaza la lista actual tras confirmación.
+ * @param {string} jsonString
+ * @returns {{ ok: boolean, error?: string, imported?: number }}
+ */
+function importarTareasDesdeJSON(jsonString) {
+  let parsed;
+  try {
+    parsed = JSON.parse(jsonString);
+  } catch {
+    return { ok: false, error: "El archivo no es un JSON válido." };
+  }
+
+  const rawTareas = Array.isArray(parsed) ? parsed : parsed?.tareas;
+  const tareas = normalizarTareas(rawTareas);
+  if (tareas.length === 0) return { ok: false, error: "No se encontraron tareas válidas para importar." };
+
+  const confirmado = window.confirm(
+    `Se van a importar ${tareas.length} tarea${tareas.length === 1 ? "" : "s"} y se reemplazará la lista actual.\n\n¿Continuar?`
+  );
+  if (!confirmado) return { ok: false, error: "Importación cancelada." };
+
+  // Limpiar DOM
+  obtenerTareasDom().forEach((t) => t.remove());
+
+  // Limpiar undo (no podemos garantizar coherencia tras reemplazo)
+  undoStack = [];
+  guardarUndoStack(undoStack);
+  actualizarUIUndo();
+
+  // Guardar en storage y repintar
+  localStorage.setItem(STORAGE_TAREAS_KEY, JSON.stringify(tareas));
+  tareas.forEach((t) => crearElemento(t));
+  guardarTareas();
+
+  return { ok: true, imported: tareas.length };
 }
 
 // ACTUALIZAR ESTADÍSTICAS
@@ -401,4 +619,79 @@ function actualizarEstadisticas(total, completadas) {
   const pendientes = total - completadas;
   if (estadisticas.pendientes.textContent !== String(pendientes))
     estadisticas.pendientes.textContent = pendientes;
+}
+
+/**
+ * Deshace la última acción registrada (borrado o marcar todas).
+ */
+function deshacerUltimaAccion() {
+  const accion = popUndo();
+  if (!accion) return;
+
+  if (accion.type === "delete_one" && accion.item) {
+    const { id, texto, completada, index } = accion.item;
+    crearElemento({ id: id || generarIdTarea(), texto, completada: Boolean(completada) }, { insertIndex: index });
+    guardarTareas();
+    return;
+  }
+
+  if (accion.type === "delete_completed" && Array.isArray(accion.items)) {
+    // Insertamos en orden por índice para reconstruir posiciones
+    const itemsOrdenados = [...accion.items].sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+    itemsOrdenados.forEach((item) => {
+      crearElemento(
+        { id: item.id || generarIdTarea(), texto: item.texto, completada: Boolean(item.completada) },
+        { insertIndex: item.index }
+      );
+    });
+    guardarTareas();
+    return;
+  }
+
+  if (accion.type === "mark_all_completed" && Array.isArray(accion.before)) {
+    const mapa = new Map(accion.before.map((x) => [x.id, Boolean(x.completada)]));
+    obtenerTareasDom().forEach((tarea) => {
+      const { id } = obtenerEstadoDeTarea(tarea);
+      if (!id || !mapa.has(id)) return;
+      marcarTarea(tarea, mapa.get(id));
+    });
+    guardarTareas();
+    return;
+  }
+}
+
+if (botonDeshacer) {
+  botonDeshacer.addEventListener("click", () => {
+    deshacerUltimaAccion();
+  });
+}
+
+if (botonExportarJSON) {
+  botonExportarJSON.addEventListener("click", () => {
+    exportarTareasComoJSON();
+  });
+}
+
+if (botonImportarJSON && inputImportarJSON) {
+  botonImportarJSON.addEventListener("click", () => {
+    inputImportarJSON.value = "";
+    inputImportarJSON.click();
+  });
+
+  inputImportarJSON.addEventListener("change", async () => {
+    const file = inputImportarJSON.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const res = importarTareasDesdeJSON(text);
+      if (!res.ok) {
+        // Cancelación también cae aquí; no es un error fatal.
+        if (res.error && res.error !== "Importación cancelada.") window.alert(res.error);
+        return;
+      }
+      window.alert(`Importación completada: ${res.imported} tarea${res.imported === 1 ? "" : "s"}.`);
+    } catch {
+      window.alert("No se pudo leer el archivo seleccionado.");
+    }
+  });
 }
