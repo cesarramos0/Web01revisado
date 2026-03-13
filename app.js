@@ -67,6 +67,33 @@ const aplicarTema = (theme) => {
   localStorage.setItem("theme", theme);
 };
 
+/**
+ * Pide confirmación antes de eliminar tareas.
+ * @param {{ modo: "una" | "completadas", textoTarea?: string, cantidad?: number }} params
+ * @returns {boolean}
+ */
+function confirmarEliminacion(params) {
+  const modo = params?.modo;
+
+  if (modo === "una") {
+    const texto = (params?.textoTarea ?? "").trim();
+    const resumen = texto ? `\n\n"${texto.length > 80 ? `${texto.slice(0, 77)}...` : texto}"` : "";
+    return window.confirm(`¿Seguro que quieres eliminar esta propuesta?${resumen}`);
+  }
+
+  if (modo === "completadas") {
+    const cantidad = Number(params?.cantidad ?? 0);
+    if (!Number.isFinite(cantidad) || cantidad <= 0) return false;
+    return window.confirm(
+      `¿Seguro que quieres eliminar ${cantidad} propuesta${cantidad === 1 ? "" : "s"} realizada${
+        cantidad === 1 ? "" : "s"
+      }?`
+    );
+  }
+
+  return window.confirm("¿Seguro que quieres eliminar?");
+}
+
 // MODO OSCURO
 if (localStorage.getItem("theme") === "dark") {
   aplicarTema("dark");
@@ -129,12 +156,14 @@ botonMarcarCompletadas.addEventListener("click", () => {
 
 // ELIMINAR TODAS LAS PROPUESTAS MARCADAS COMO COMPLETADAS
 botonBorrarCompletadas.addEventListener("click", () => {
-  obtenerTareasDom().forEach((tarea) => {
-    const { estaCompletada } = obtenerEstadoDeTarea(tarea);
-    if (estaCompletada) {
-      tarea.remove();
-    }
-  });
+  const tareas = obtenerTareasDom();
+  const completadas = tareas.filter((tarea) => obtenerEstadoDeTarea(tarea).estaCompletada);
+  if (completadas.length === 0) return;
+
+  const confirmado = confirmarEliminacion({ modo: "completadas", cantidad: completadas.length });
+  if (!confirmado) return;
+
+  completadas.forEach((tarea) => tarea.remove());
   guardarTareas();
 });
 
@@ -217,6 +246,9 @@ function crearElemento(tareaObj) {
   const botonEliminar = nuevaTarea.querySelector(".btn-borrar");
   botonEliminar.addEventListener("click", (event) => {
     event.stopPropagation();
+    const { texto } = obtenerEstadoDeTarea(nuevaTarea);
+    const confirmado = confirmarEliminacion({ modo: "una", textoTarea: texto });
+    if (!confirmado) return;
     nuevaTarea.remove();
     guardarTareas();
   });
