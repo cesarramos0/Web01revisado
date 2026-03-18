@@ -126,8 +126,8 @@ function actualizarUIValidacionTarea(resultado) {
   if (contadorTarea) {
     contadorTarea.textContent = `${resultado.length} / ${resultado.max}`;
     const tieneError = !resultado.ok;
-    contadorTarea.classList.toggle("text-red-600", tieneError);
-    contadorTarea.classList.toggle("dark:text-red-400", tieneError);
+    contadorTarea.classList.toggle("text-white", !tieneError);
+    contadorTarea.classList.toggle("dark:text-white", !tieneError);
   }
 
   if (mensajeErrorTarea) {
