@@ -21,14 +21,13 @@ const CLASES_CONTENEDOR_COMPLETADA = ["bg-gray-100", "dark:bg-slate-700", "opaci
 const CLASES_CONTENEDOR_PENDIENTE = ["bg-white", "dark:bg-slate-800"];
 const CLASES_TEXTO_COMPLETADA = ["line-through", "text-gray-400", "dark:text-gray-500"];
 const CLASES_TEXTO_PENDIENTE = ["text-gray-800", "dark:text-gray-200"];
-const MAX_CARACTERES_TAREA = 120;
+const MAX_CARACTERES_TAREA = 300;
 const raizHTML = document.documentElement;
 
 const STORAGE_TAREAS_KEY = "tareas-mkt23";
 const STORAGE_UNDO_KEY = "tareas-mkt23-undo";
 const MAX_UNDO_ACCIONES = 20;
 
-// Referencias a estadísticas (si existen en el HTML)
 const estadisticas = {
   total: document.getElementById("stat-total"),
   completadas: document.getElementById("stat-completadas"),
@@ -234,6 +233,15 @@ textareaPropuesta.addEventListener("input", function () {
 
   const resultado = validarTextoTarea(this.value, { max: MAX_CARACTERES_TAREA });
   actualizarUIValidacionTarea(resultado);
+});
+
+// === NUEVO EVENTO: ENVIAR CON ENTER (¡Va por separado!) ===
+textareaPropuesta.addEventListener("keydown", function(event) {
+
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        formularioTareas.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })); 
+    }
 });
 
 // Estado inicial de contador/validación

@@ -18,3 +18,86 @@
     font-family: var(--font-principal);
   }
 }
+
+@layer components {
+  /* Enlaces del header */
+  .nav-link {
+    @apply text-white no-underline border-b-2 border-transparent pb-1 transition-all duration-300 hover:border-acento hover:text-acento focus:text-acento outline-none;
+  }
+
+  .titulo-seccion{
+    @apply mt-8 mb-4 text-primario dark:text-orange-400 font-titulos text-2xl font-bold;
+  }
+
+  .contenedor-seguimiento{
+    @apply bg-white dark:bg-slate-800 rounded-lg p-4 flex justify-between items-center shadow-sm hover:shadow-md transition-shadow;
+  }
+
+  .titulo-seguimiento{
+    @apply font-medium text-gray-800 dark:text-gray-200 flex-1;
+  }
+
+  .subtitulo-seguimiento{
+    @apply hidden sm:block text-gray-500 dark:text-gray-400 text-sm flex-1 text-center;
+  }
+
+  .estado-seguimiento{
+    @apply text-white px-3 py-1 rounded-full font-bold text-xs;
+  }
+
+  .contenedor-resena{
+    @apply border-l-4 border-acento p-5 bg-orange-50 dark:bg-slate-800 dark:border-orange-500 mb-5 rounded-r-lg shadow-sm;
+  }
+
+  .titulo-resena{
+    @apply font-bold text-lg mb-2 dark:text-white;
+  }
+
+  .autor-resena{
+    @apply text-sm text-gray-600 dark:text-gray-400;
+  }
+
+  .parrafo-originalidad{
+    @apply text-sm text-gray-700 dark:text-gray-300;
+  }
+
+  .articulo-interes{
+    @apply bg-gray-50 dark:bg-slate-700 p-6 rounded-lg border border-gray-100 dark:border-slate-600 flex flex-col justify-between text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-acento dark:hover:border-acento cursor-pointer;
+  }
+
+  .titulo-articulo-interes{
+    @apply font-medium text-sm lg:text-base dark:text-gray-200;
+  }
+
+  .img-interes{
+    @apply w-full aspect-square object-cover rounded mt-5;
+  }
+
+  .titulo-rrss{
+    @apply font-bold text-xl mb-3 text-acento;
+  }
+
+  .info-rrss{
+    @apply text-gray-300 hover:text-white transition-colors;
+  }
+
+  .link-rrss{
+    @apply opacity-80 hover:opacity-100 hover:scale-110 transition-all;
+  }
+
+  .boton-propuesta{
+    @apply bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-slate-600 py-2 px-4 rounded-lg font-medium text-sm cursor-pointer transition-all duration-300 hover:bg-gray-200 dark:hover:bg-slate-600 shadow-sm;
+  }
+
+  .contenedor-estadisticas{
+    @apply flex justify-between items-center;
+  }
+
+  .texto-estadisticas{
+    @apply text-gray-600 dark:text-gray-400 font-medium cursor-pointer transition-colors duration-200 hover:text-gray-400 dark:hover:text-white;
+  }
+
+  .resultado-estadisticas{
+    @apply font-bold text-xl text-gray-800 dark:text-white;
+  }
+}
