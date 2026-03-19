@@ -61,7 +61,7 @@ Con este cambio, en modo claro el texto sigue siendo visible y el efecto hover s
 
 Es necesario tener **Node.js** instalado. Para verificarlo, abriremos una terminal (en Windows `Win + R`, escribimos `cmd` y pulsamos Enter).
 
-![Terminal Windows](image-7.png)
+![Terminal Windows](img/image-7.png)
 
 Dentro de la terminal escribiremos:
 ```bash
@@ -70,7 +70,7 @@ node --version
 
 Debería mostrarse la versión instalada.
 
-![Node version](image-8.png)
+![Node version](img/image-8.png)
 
 Si aparece un error confirmando la ausencia de Node.js, deberemos instalarlo desde:
 [https://nodejs.org/es](https://nodejs.org/es)
@@ -83,19 +83,19 @@ Una vez tengamos Node.js, empezaremos con la instalación del servidor MCP. En n
 
 **1.** Abrimos Cursor y nos dirigimos a la zona superior izquierda seleccionando **File**.
 
-![File menu](image-2.png)
+![File menu](img/image-2.png)
 
 **2.** Navegamos a **Preferences** → **Cursor Settings**.
 
-![Cursor Settings](image-3.png)
+![Cursor Settings](img/image-3.png)
 
 **3.** Se abrirá el menú de configuración. En el cuadro de búsqueda escribimos `MCP` y seleccionamos **Tools & MCP**.
 
-![Tools & MCP](image-4.png)
+![Tools & MCP](img/image-4.png)
 
 **4.** Aparecerá la sección **Installed MCP Servers**. Hacemos clic en **Add Custom MCP**.
 
-![Add Custom MCP](image-5.png)
+![Add Custom MCP](img/image-5.png)
 
 **5.** Se abrirá el archivo `mcp.json`. Escribimos lo siguiente con la ruta absoluta de nuestro proyecto:
 ```json
