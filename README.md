@@ -3,6 +3,8 @@
 ¡Bienvenido a **Ikeadocs**! Este proyecto es una landing page interactiva y moderna diseñada para el lanzamiento de la nueva mesa inteligente **MKT23**. El sitio combina un diseño limpio inspirado en la estética funcional con características dinámicas y gestión de estado local.
 
 ---
+https://bootcamp-project-pi.vercel.app/
+---
 
 ## ✨ Características Principales
 
