@@ -1,6 +1,8 @@
 # 🪑 Ikeadocs - Lanzamiento MKT23
 
-¡Bienvenido a **Ikeadocs**! Este proyecto es una landing page interactiva y moderna diseñada para el lanzamiento de la nueva mesa inteligente **MKT23**. El sitio combina un diseño limpio inspirado en la estética funcional con características dinámicas y gestión de estado local.
+Aplicación web full-stack para el lanzamiento de la mesa inteligente **MKT23**.
+Combina una landing page interactiva con un sistema de gestión de propuestas
+respaldado por una API REST construida con Node.js y Express.
 
 ---
 https://bootcamp-project-pi.vercel.app/
@@ -8,125 +10,173 @@ https://bootcamp-project-pi.vercel.app/
 
 ## ✨ Características Principales
 
-* **🌓 Modo Oscuro Persistente:** Alternancia entre temas claro y oscuro con guardado automático en `localStorage`.
-* **📋 Gestión de Propuestas (CRUD):** Los usuarios pueden añadir, visualizar y eliminar propuestas de mejora.
-* **🗑️ Confirmación al Eliminar:** Diálogo de confirmación antes de eliminar una tarea para evitar borrados accidentales.
-* **🔢 Contador de Caracteres:** Límite de caracteres con indicador visual y aviso de advertencia al acercarse al límite.
-* **📤 Export / Import de Tareas:** Copia de seguridad y restauración de propuestas mediante exportación e importación de datos.
-* **🔍 Buscador en Tiempo Real:** Filtro inteligente de propuestas mediante expresiones regulares para una búsqueda exacta.
-* **📱 Diseño Totalmente Responsivo:** Optimizado para móviles, tablets y escritorio utilizando **Tailwind CSS 4.0**.
-* **💾 Persistencia de Datos:** Todas las propuestas se guardan en el navegador para que no se pierdan al recargar.
+* **🌓 Modo Oscuro Persistente:** Alternancia entre temas claro y oscuro guardado en `localStorage`.
+* **📋 Gestión de Propuestas (CRUD):** Crear, visualizar y eliminar propuestas mediante API REST.
+* **🔄 Estados de red:** Indicadores visuales de carga y error en cada operación de red.
+* **🗑️ Confirmación al Eliminar:** Diálogo de confirmación antes de eliminar una propuesta.
+* **🔢 Contador de Caracteres:** Límite de caracteres con indicador visual en tiempo real.
+* **📤 Export / Import de Tareas:** Copia de seguridad y restauración mediante JSON.
+* **🔍 Buscador en Tiempo Real:** Filtro de propuestas mediante expresiones regulares.
+* **📱 Diseño Totalmente Responsivo:** Optimizado para móviles, tablets y escritorio con Tailwind CSS 4.0.
+* **↩️ Deshacer acciones:** Reversión de la última acción realizada sobre la lista.
 
 ---
 
 ## 🛠️ Tecnologías Utilizadas
 
-Este proyecto ha sido desarrollado utilizando tecnologías web modernas:
-
 | Tecnología | Uso |
 | :--- | :--- |
 | **HTML5** | Estructura semántica del sitio. |
-| **Tailwind CSS 4.0** | Estilizado mediante variables de tema personalizadas y utilidades. |
-| **JavaScript (ES6+)** | Lógica de la aplicación, manipulación del DOM y persistencia. |
-| **LocalStorage** | Almacenamiento local de datos y preferencias de usuario. |
+| **Tailwind CSS 4.0** | Estilizado mediante variables de tema y utilidades. |
+| **JavaScript (ES6+)** | Lógica del frontend, manipulación del DOM y comunicación con la API. |
+| **Node.js** | Entorno de ejecución del servidor backend. |
+| **Express.js** | Framework para la construcción de la API REST. |
+| **dotenv** | Gestión de variables de entorno. |
+| **cors** | Gestión de cabeceras de seguridad de origen cruzado. |
+
+---
+
+## 📂 Estructura del Proyecto
+```
+ikeadocs/
+├── server/                         # Backend: API REST
+│   ├── src/
+│   │   ├── config/
+│   │   │   └── env.js              # Validación de variables de entorno al arranque
+│   │   ├── controllers/
+│   │   │   └── task.controller.js  # Validación de entrada y traducción HTTP
+│   │   ├── routes/
+│   │   │   └── task.routes.js      # Mapeo de verbos HTTP a controladores
+│   │   ├── services/
+│   │   │   └── task.service.js     # Lógica de negocio pura, sin dependencia de HTTP
+│   │   └── index.js                # Punto de entrada y registro de middlewares
+│   ├── .env                        # Variables de entorno (no incluido en Git)
+│   ├── .env.example                # Plantilla de variables requeridas
+│   └── package.json
+├── src/
+│   └── api/
+│       └── client.js               # Capa de red del frontend
+├── dist/
+│   └── output.css                  # CSS generado por Tailwind
+├── img/                            # Imágenes y recursos visuales
+├── app.js                          # Lógica del frontend
+└── index.html                      # Estructura principal
+```
+
+---
+
+## ⚙️ Middlewares
+
+La API utiliza tres middlewares globales registrados en `index.js`:
+
+**`cors()`** añade la cabecera `Access-Control-Allow-Origin` a cada respuesta,
+permitiendo que el navegador acepte respuestas de un origen distinto al del
+frontend. Sin este middleware, el navegador bloquearía todas las peticiones
+del frontend al backend por la política de mismo origen.
+
+**`express.json()`** intercepta el flujo de datos crudo de cada petición entrante,
+parsea el cuerpo JSON y lo expone como objeto JavaScript en `req.body`. Sin él,
+`req.body` sería `undefined` en todos los controladores.
+
+**Middleware de errores `(err, req, res, next)`** captura cualquier error propagado
+con `next(error)` desde los controladores. Traduce errores de dominio a códigos
+HTTP semánticos (`NOT_FOUND` → 404) y evita filtrar trazas técnicas al cliente
+devolviendo un mensaje genérico en los errores 500.
 
 ---
 
 ## 📦 Instalación y Configuración
 
-Para visualizar el proyecto localmente, sigue estos pasos:
+### Requisitos previos
+* Node.js 18 o superior
+* npm
 
-1. **Clona el repositorio:**
+### Backend
 ```bash
-    git clone https://github.com/tu-usuario/ikeadocs.git
+cd server
+npm install
+cp .env.example .env
+npm run dev
 ```
-2. **Instala Tailwind CSS:**
-    Este proyecto utiliza la nueva versión de Tailwind. Asegúrate de tenerlo configurado o usa el CDN para pruebas rápidas. Para el flujo de trabajo estándar:
+
+El servidor arrancará en `http://localhost:3000`.
+
+### Frontend
+
+Instala Tailwind y compila el CSS:
 ```bash
-    npm install tailwindcss
-```
-3. **Compila el CSS:**
-```bash
-    npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch
-```
-4. **Abre el archivo `index.html`** en tu navegador preferido.
-
----
-
-## 📂 Estructura del Proyecto
-
-* `index.html`: Estructura principal y componentes.
-* `app.js`: Lógica de interactividad (Modo oscuro, gestión de tareas, buscadores).
-* `dist/output.css`: Archivo CSS generado por Tailwind.
-* `img/`: Directorio para imágenes y recursos visuales (logos, fotos de producto).
-
----
-  
-## 📖 Ejemplos de Uso
-
-### Añadir una propuesta
-1. Escribe tu propuesta en el campo de texto del formulario.
-2. El contador de caracteres se actualizará en tiempo real mostrando los caracteres restantes.
-3. Pulsa **Enter** o el botón de envío para añadirla a la lista.
-
-### Buscar una propuesta
-1. Escribe en el buscador la palabra clave que quieras encontrar.
-2. La lista se filtrará automáticamente mostrando solo las propuestas que contengan esa palabra exacta.
-3. Borra el texto del buscador para volver a ver todas las propuestas.
-
-### Gestionar el estado de una propuesta
-1. Haz clic sobre una propuesta para marcarla como **completada** (aparecerá tachada y con menor opacidad).
-2. Vuelve a hacer clic para desmarcarla como pendiente.
-3. Los contadores de *Total*, *Completadas* y *Pendientes* se actualizarán automáticamente.
-
-### Eliminar una propuesta
-1. Pulsa el botón de eliminar junto a la propuesta que desees borrar.
-2. Aparecerá un **diálogo de confirmación** para evitar borrados accidentales.
-3. Confirma la acción para eliminar la propuesta definitivamente.
-
-### Exportar e importar propuestas
-1. Pulsa el botón **Exportar** para descargar una copia de seguridad con todas tus propuestas actuales.
-2. Para restaurarlas, pulsa **Importar** y selecciona el archivo descargado anteriormente.
-3. Las propuestas se cargarán automáticamente sin pérdida de datos.
-
-### Cambiar el tema de la interfaz
-1. Pulsa el botón de tema (🌙 / ☀️) situado en la cabecera.
-2. La interfaz alternará entre **modo oscuro** y **modo claro**.
-3. Tu preferencia se guardará automáticamente y se mantendrá al recargar la página.
----
-
-## 🚀 Funcionalidades Destacadas en el Código
-
-### Buscador con RegEx
-El sistema de búsqueda utiliza una expresión regular para asegurar que las coincidencias sean precisas palabra por palabra:
-```javascript
-const reglaExacta = new RegExp(`\\b${filtro}\\b`, 'i');
+npm install tailwindcss
+npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch
 ```
 
-### Contador de Caracteres con Warning
-Indicador visual que avisa al usuario cuando se acerca al límite permitido, bloqueando el envío si se supera.
-
-### Export / Import de Tareas
-Permite exportar todas las propuestas actuales como copia de seguridad y restaurarlas posteriormente sin pérdida de datos.
+Abre `index.html` con Live Server.
 
 ---
 
-## 🧪 Pruebas de Software (Testing)
+## 🌐 Referencia de la API REST
 
-Se han realizado pruebas manuales para garantizar la estabilidad y el correcto funcionamiento de la aplicación en diversos escenarios críticos:
+Base URL: `http://localhost:3000/api/v1`
 
-| Caso de Prueba | Acción Realizada | Resultado Esperado | Estado |
+### Obtener todas las tareas
+```
+GET /tasks
+
+Respuesta: 200 OK
+[
+  {
+    "id": 1,
+    "titulo": "Mi propuesta",
+    "prioridad": 1,
+    "completado": false
+  }
+]
+```
+
+### Crear una tarea
+```
+POST /tasks
+Content-Type: application/json
+
+{
+  "titulo": "Mi propuesta",
+  "prioridad": 1
+}
+
+Respuesta exitosa: 201 Created
+{
+  "id": 1,
+  "titulo": "Mi propuesta",
+  "prioridad": 1,
+  "completado": false
+}
+
+Errores posibles:
+400 Bad Request → { "error": "El título es obligatorio y debe tener al menos 3 caracteres." }
+400 Bad Request → { "error": "La prioridad debe ser un número positivo." }
+```
+
+### Eliminar una tarea
+```
+DELETE /tasks/:id
+
+Respuesta exitosa:  204 No Content
+Tarea no encontrada: 404 Not Found → { "error": "Recurso no encontrado." }
+ID no numérico:      400 Bad Request → { "error": "El ID debe ser un número." }
+```
+
+---
+
+## 🧪 Pruebas de Integración
+
+Colección de casos probados con Postman:
+
+| Caso | Método | Body | Código esperado |
 | :--- | :--- | :--- | :---: |
-| **Lista Vacía** | Carga inicial de la aplicación sin datos previos. | La interfaz se muestra limpia y los contadores de estadísticas marcan 0. | ✅ |
-| **Validación de Texto** | Intentar añadir una tarea sin escribir contenido. | El sistema bloquea la creación (mediante `trim()`) evitando tareas vacías. | ✅ |
-| **Desbordamiento (Overflow)** | Añadir una tarea con una palabra de más de 200 caracteres. | El diseño se mantiene intacto gracias a `break-all` y `min-w-0`. | ✅ |
-| **Gestión de Estados** | Marcar y desmarcar múltiples tareas como completadas. | El estilo visual cambia (tachado/opacidad) y las estadísticas se actualizan. | ✅ |
-| **Persistencia** | Recargar la página (`F5`) tras modificar la lista. | Los datos se recuperan correctamente desde `localStorage`. | ✅ |
-| **Limpieza Masiva** | Eliminar todas las tareas completadas mediante el botón global. | Solo se eliminan las tareas marcadas, recalculando el total. | ✅ |
-| **Confirmación Eliminación** | Intentar eliminar una tarea individualmente. | Aparece un diálogo de confirmación antes de proceder al borrado. | ✅ |
-| **Límite de Caracteres** | Escribir más caracteres del límite permitido. | Se muestra un aviso de warning y se bloquea el envío del formulario. | ✅ |
-| **Export de Tareas** | Exportar la lista actual de propuestas. | Se genera correctamente el archivo de copia de seguridad. | ✅ |
-| **Import de Tareas** | Importar un archivo de copia de seguridad. | Las tareas se restauran correctamente sin pérdida de datos. | ✅ |
-
-### Resultados Finales
-Tras las pruebas, se confirma que la gestión de memoria en el navegador es eficiente y el diseño es totalmente responsivo, adaptándose a contenidos inusuales sin romper la arquitectura visual.
+| Crear tarea correctamente | POST | `{ "titulo": "Comprar pan", "prioridad": 1 }` | 201 |
+| Crear tarea sin título | POST | `{ "prioridad": 1 }` | 400 |
+| Crear tarea con título corto | POST | `{ "titulo": "ab", "prioridad": 1 }` | 400 |
+| Crear tarea con prioridad como texto | POST | `{ "titulo": "Comprar pan", "prioridad": "alta" }` | 400 |
+| Obtener todas las tareas | GET | — | 200 |
+| Eliminar tarea existente | DELETE | — | 204 |
+| Eliminar tarea inexistente | DELETE | — | 404 |
+| Eliminar con ID no numérico | DELETE | — | 400 |
