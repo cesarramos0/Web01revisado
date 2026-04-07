@@ -1,3 +1,5 @@
+import { obtenerTareas, crearTarea, eliminarTarea } from './src/api/client.js';
+
 // VARIABLES
 const formularioTareas = document.getElementById("formulario-tareas");
 const textareaPropuesta = document.getElementById("input-tarea");
@@ -24,14 +26,34 @@ const CLASES_TEXTO_PENDIENTE = ["text-gray-800", "dark:text-gray-200"];
 const MAX_CARACTERES_TAREA = 300;
 const raizHTML = document.documentElement;
 
-const STORAGE_TAREAS_KEY = "tareas-mkt23";
-const STORAGE_UNDO_KEY = "tareas-mkt23-undo";
 const MAX_UNDO_ACCIONES = 20;
 
 const estadisticas = {
   total: document.getElementById("stat-total"),
   completadas: document.getElementById("stat-completadas"),
   pendientes: document.getElementById("stat-pendientes"),
+};
+
+// ESTADOS DE RED
+const indicadorCarga = document.getElementById("indicador-carga");
+const mensajeErrorRed = document.getElementById("mensaje-error-red");
+
+const mostrarCargando = () => {
+  if (indicadorCarga) indicadorCarga.style.display = "block";
+};
+
+const ocultarCargando = () => {
+  if (indicadorCarga) indicadorCarga.style.display = "none";
+};
+
+const mostrarErrorRed = (mensaje) => {
+  if (!mensajeErrorRed) return;
+  mensajeErrorRed.textContent = mensaje;
+  mensajeErrorRed.style.display = "block";
+};
+
+const ocultarErrorRed = () => {
+  if (mensajeErrorRed) mensajeErrorRed.style.display = "none";
 };
 
 const SELECTOR_TAREA_ITEM = ".lista-propuestas .tarea-item";
@@ -168,31 +190,11 @@ function confirmarEliminacion(params) {
   return window.confirm("¿Seguro que quieres eliminar?");
 }
 
-/**
- * Carga la pila de acciones Undo desde localStorage.
- * @returns {Array}
- */
 function cargarUndoStack() {
-  try {
-    const raw = localStorage.getItem(STORAGE_UNDO_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
+  return [];
 }
 
-/**
- * Persiste la pila de acciones Undo en localStorage.
- * @param {Array} stack
- */
-function guardarUndoStack(stack) {
-  try {
-    localStorage.setItem(STORAGE_UNDO_KEY, JSON.stringify(stack.slice(0, MAX_UNDO_ACCIONES)));
-  } catch {
-    // noop
-  }
-}
+function guardarUndoStack(stack) {}
 
 let undoStack = cargarUndoStack();
 
@@ -254,7 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ESCUCHA DE EVENTOS (Añadir tarea)
-formularioTareas.addEventListener("submit", (event) => {
+formularioTareas.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const texto = textareaPropuesta.value || "";
@@ -267,13 +269,22 @@ formularioTareas.addEventListener("submit", (event) => {
   }
 
   const textoLimpio = texto.trim();
-  crearElemento({ id: generarIdTarea(), texto: textoLimpio, completada: false });
+  mostrarCargando();
+  ocultarErrorRed();
 
-  textareaPropuesta.value = "";
-  textareaPropuesta.style.height = "auto";
-  const resultadoReset = validarTextoTarea("", { max: MAX_CARACTERES_TAREA });
-  actualizarUIValidacionTarea(resultadoReset);
-  guardarTareas();
+  try {
+    const nuevaTarea = await crearTarea(textoLimpio, 1);
+    crearElemento({ ...nuevaTarea, texto: nuevaTarea.titulo});
+
+    textareaPropuesta.value = "";
+    textareaPropuesta.style.height = "auto";
+    actualizarUIValidacionTarea(validarTextoTarea("", { max: MAX_CARACTERES_TAREA }));
+    guardarTareas();
+  } catch (error) {
+    mostrarErrorRed(error.message || "No se pudo crear la tarea.");
+  } finally {
+    ocultarCargando();
+  }
 });
 
 // BUSQUEDA DE PROPUESTAS
@@ -350,20 +361,19 @@ botonFiltroTotal.addEventListener("click", () => filtrarTareas("todas"));
  * Lee las tareas guardadas en localStorage y las pinta en la interfaz.
  * Normaliza tanto el formato antiguo (string) como el nuevo (objeto).
  */
-function cargarTareasDeStorage() {
-  const almacenadas = JSON.parse(localStorage.getItem(STORAGE_TAREAS_KEY)) || [];
+async function cargarTareasDeStorage() {
+  ocultarErrorRed();
+  mostrarCargando();
 
-  almacenadas.forEach((item) => {
-    const tareaBase = typeof item === "string" ? { texto: item, completada: false } : item;
-    const tarea = {
-      id: tareaBase.id || generarIdTarea(),
-      texto: tareaBase.texto,
-      completada: Boolean(tareaBase.completada),
-    };
-    crearElemento(tarea);
-  });
-
-  guardarTareas();
+  try {
+    const tareas = await obtenerTareas();
+    tareas.forEach((tarea) => crearElemento(tarea));
+    actualizarEstadisticas(tareas.length, tareas.filter((t) => t.completada).length);
+  } catch (error) {
+    mostrarErrorRed("No se pudieron cargar las tareas. ¿Está el servidor encendido?");
+  } finally {
+    ocultarCargando();
+  }
 }
 
 /**
@@ -424,21 +434,33 @@ function crearElemento(tareaObj, opciones = {}) {
 
   // Botón de eliminar
   const botonEliminar = nuevaTarea.querySelector(".btn-borrar");
-  botonEliminar.addEventListener("click", (event) => {
-    event.stopPropagation();
-    const { texto, id, estaCompletada } = obtenerEstadoDeTarea(nuevaTarea);
-    const confirmado = confirmarEliminacion({ modo: "una", textoTarea: texto });
-    if (!confirmado) return;
+  botonEliminar.addEventListener("click", async (event) => {
+  event.stopPropagation();
+  const { texto, id, estaCompletada } = obtenerEstadoDeTarea(nuevaTarea);
+  const confirmado = confirmarEliminacion({ modo: "una", textoTarea: texto });
+  if (!confirmado) return;
 
-    const index = obtenerTareasDom().indexOf(nuevaTarea);
-    pushUndo({
-      type: "delete_one",
-      item: { id, texto, completada: estaCompletada, index },
-      at: Date.now(),
-    });
+  const index = obtenerTareasDom().indexOf(nuevaTarea);
+  pushUndo({
+    type: "delete_one",
+    item: { id, texto, completada: estaCompletada, index },
+    at: Date.now(),
+  });
+
+  mostrarCargando();
+  ocultarErrorRed();
+
+  try {
+    await eliminarTarea(id);
     nuevaTarea.remove();
     guardarTareas();
-  });
+  } catch (error) {
+    mostrarErrorRed("No se pudo eliminar la tarea.");
+    popUndo();
+  } finally {
+    ocultarCargando();
+  }
+});
 
   // Botón de editar
   const botonEditar = nuevaTarea.querySelector(".btn-editar");
@@ -484,24 +506,16 @@ function filtrarTareas(tipoFiltro) {
   });
 }
 
-// GUARDAR LOCALMENTE
-/**
- * Recorre las tareas actuales del DOM y las guarda en localStorage,
- * además de recalcular y actualizar las estadísticas.
- */
 function guardarTareas() {
-  const todasTareas = [];
   let completadas = 0;
+  const total = obtenerTareasDom().length;
 
   obtenerTareasDom().forEach((tarea) => {
-    const { texto, estaCompletada, id } = obtenerEstadoDeTarea(tarea);
-
+    const { estaCompletada } = obtenerEstadoDeTarea(tarea);
     if (estaCompletada) completadas++;
-    todasTareas.push({ id, texto, completada: estaCompletada });
   });
 
-  localStorage.setItem(STORAGE_TAREAS_KEY, JSON.stringify(todasTareas));
-  actualizarEstadisticas(todasTareas.length, completadas);
+  actualizarEstadisticas(total, completadas);
 }
 
 /**
@@ -536,28 +550,20 @@ function normalizarTareas(array) {
   return normalizadas;
 }
 
-/**
- * Exporta las tareas actuales como JSON (string) y dispara descarga.
- * @returns {string}
- */
 function exportarTareasComoJSON() {
-  let tareas = [];
-  try {
-    tareas = JSON.parse(localStorage.getItem(STORAGE_TAREAS_KEY) || "[]");
-  } catch {
-    tareas = [];
-  }
-  const normalizadas = normalizarTareas(tareas);
+  const tareas = obtenerTareasDom().map((tarea) => {
+    const { id, texto, estaCompletada } = obtenerEstadoDeTarea(tarea);
+    return { id, texto, completada: estaCompletada };
+  });
 
   const payload = {
     version: 1,
     exportedAt: new Date().toISOString(),
     app: "Ikeadocs",
-    tareas: normalizadas,
+    tareas,
   };
 
   const jsonString = JSON.stringify(payload, null, 2);
-
   const blob = new Blob([jsonString], { type: "application/json;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -587,6 +593,7 @@ function importarTareasDesdeJSON(jsonString) {
 
   const rawTareas = Array.isArray(parsed) ? parsed : parsed?.tareas;
   const tareas = normalizarTareas(rawTareas);
+  
   if (tareas.length === 0) return { ok: false, error: "No se encontraron tareas válidas para importar." };
 
   const confirmado = window.confirm(
@@ -594,16 +601,12 @@ function importarTareasDesdeJSON(jsonString) {
   );
   if (!confirmado) return { ok: false, error: "Importación cancelada." };
 
-  // Limpiar DOM
   obtenerTareasDom().forEach((t) => t.remove());
 
-  // Limpiar undo (no podemos garantizar coherencia tras reemplazo)
   undoStack = [];
   guardarUndoStack(undoStack);
   actualizarUIUndo();
-
-  // Guardar en storage y repintar
-  localStorage.setItem(STORAGE_TAREAS_KEY, JSON.stringify(tareas));
+  
   tareas.forEach((t) => crearElemento(t));
   guardarTareas();
 

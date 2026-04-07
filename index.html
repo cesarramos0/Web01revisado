@@ -218,6 +218,11 @@
                             </button>
                             <span id="stat-pendientes" class="resultado-estadisticas">0</span>
                         </div>
+                        <h3 class="font-bold text-lg text-primario dark:text-white pb-2">Estado del servidor</h3>
+                        <div id="indicador-carga" style="display:none">
+                            Cargando...
+                        </div>
+                        <div id="mensaje-error-red" style="display:none; color:red;"></div>
                     </div>
                     </div>
                 </aside>
@@ -225,7 +230,8 @@
             </div>
         </div>
     </footer>
-    <script src="app.js"></script>
+    <script type="module" src="src/api/client.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 
 </html>
