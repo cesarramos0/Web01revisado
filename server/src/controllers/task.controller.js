@@ -24,7 +24,7 @@ const crearTarea = (req, res) => {
   res.status(201).json(nuevaTarea);
 };
 
-const eliminarTarea = (req, res) => {
+const eliminarTarea = (req, res, next) => {
   const id = parseInt(req.params.id, 10);
 
   if (isNaN(id)) {
@@ -35,7 +35,7 @@ const eliminarTarea = (req, res) => {
     taskService.eliminarTarea(id);
     res.status(204).send();
   } catch (error) {
-      next(error);
+    next(error);
   }
 };
 
