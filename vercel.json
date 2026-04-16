@@ -8,6 +8,22 @@
     {
       "src": "index.html",
       "use": "@vercel/static"
+    },
+    {
+      "src": "dist/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "img/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "app.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "src/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -16,12 +32,8 @@
       "dest": "server/src/index.js"
     },
     {
-      "src": "/(.*\\.(js|css|png|ico|json|jpg|svg|woff|woff2|ttf))",
-      "dest": "/$1"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/$1"
     }
   ]
 }
