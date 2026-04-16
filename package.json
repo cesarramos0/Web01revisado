@@ -6,15 +6,14 @@
     "build": "npx @tailwindcss/cli -i ./input.css -o ./dist/output.css",
     "watch": "npx @tailwindcss/cli -i ./input.css -o ./dist/output.css --watch"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.88.0",
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1"
+  },
   "devDependencies": {
     "@tailwindcss/cli": "^4.2.1",
     "tailwindcss": "^4.2.1"
-  },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.88.0"
   }
 }
